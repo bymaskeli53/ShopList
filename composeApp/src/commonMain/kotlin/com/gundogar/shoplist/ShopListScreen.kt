@@ -3,9 +3,9 @@ package com.gundogar.shoplist
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -36,7 +36,8 @@ fun ShoppingListScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { if (newText.isNotBlank()) { onAddItem(newText); newText = "" } }) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
+               Icon(Icons.Default.Add, contentDescription = "Add")
+               // Text("")
 
             }
         }
