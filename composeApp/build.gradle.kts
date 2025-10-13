@@ -47,6 +47,11 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
+            implementation(libs.lifecycle.viewmodel.compose)
+            implementation(libs.androidx.lifecycle.runtime)
+            implementation(libs.lifecycle.runtime.compose)
+            implementation(libs.navigation.compose)
+
 
         }
         commonTest.dependencies {
