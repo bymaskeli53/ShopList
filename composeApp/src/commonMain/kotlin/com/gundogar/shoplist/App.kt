@@ -43,6 +43,7 @@ fun App(databaseDriverFactory: DatabaseDriverFactory) {
                 route = "detail/{listId}"
             ) { backStackEntry ->
                 val listId = backStackEntry.arguments?.getString("listId")
+                // Re-find the list from the reactive StateFlow on every recomposition
                 val list = lists.find { it.id == listId }
 
                 if (list != null) {
@@ -50,7 +51,8 @@ fun App(databaseDriverFactory: DatabaseDriverFactory) {
                         list = list,
                         onNavigateBack = { navController.popBackStack() },
                         onSave = { id: String, items: List<ShoppingListItemUI> ->
-                            viewModel.updateListItems(id, items)
+                            // This is now a suspend function that waits for update to complete
+                            viewModel.updateListItemsSuspend(id, items)
                         }
                     )
                 }

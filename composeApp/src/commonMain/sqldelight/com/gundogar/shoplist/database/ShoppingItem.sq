@@ -1,0 +1,80 @@
+-- Shopping List table (main list)
+CREATE TABLE ShoppingList (
+    id TEXT PRIMARY KEY NOT NULL,
+    bought INTEGER NOT NULL DEFAULT 0,
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL DEFAULT 0
+);
+
+-- Shopping List Items (items within each list)
+CREATE TABLE ShoppingListItem (
+    id TEXT PRIMARY KEY NOT NULL,
+    listId TEXT NOT NULL,
+    title TEXT NOT NULL,
+    amount TEXT NOT NULL DEFAULT '',
+    position INTEGER NOT NULL,
+    FOREIGN KEY (listId) REFERENCES ShoppingList(id) ON DELETE CASCADE
+);
+
+-- Get all shopping lists with their items
+getAllLists:
+SELECT * FROM ShoppingList
+ORDER BY createdAt DESC;
+
+-- Get items for a specific list
+getItemsForList:
+SELECT * FROM ShoppingListItem
+WHERE listId = ?
+ORDER BY position ASC;
+
+-- Get a single list by id
+getListById:
+SELECT * FROM ShoppingList
+WHERE id = ?;
+
+-- Insert a new shopping list
+insertList:
+INSERT INTO ShoppingList(id, bought, createdAt, updatedAt)
+VALUES (?, ?, ?, ?);
+
+-- Insert a shopping list item
+insertListItem:
+INSERT INTO ShoppingListItem(id, listId, title, amount, position)
+VALUES (?, ?, ?, ?, ?);
+
+-- Update list bought status
+updateListBoughtStatus:
+UPDATE ShoppingList
+SET bought = ?
+WHERE id = ?;
+
+-- Touch list to trigger Flow update
+touchList:
+UPDATE ShoppingList
+SET updatedAt = ?
+WHERE id = ?;
+
+-- Update a list item
+updateListItem:
+UPDATE ShoppingListItem
+SET title = ?, amount = ?
+WHERE id = ?;
+
+-- Delete a list (items will be cascade deleted)
+deleteList:
+DELETE FROM ShoppingList
+WHERE id = ?;
+
+-- Delete a list item
+deleteListItem:
+DELETE FROM ShoppingListItem
+WHERE id = ?;
+
+-- Delete all items for a list
+deleteAllItemsForList:
+DELETE FROM ShoppingListItem
+WHERE listId = ?;
+
+-- Delete all lists
+deleteAllLists:
+DELETE FROM ShoppingList;
