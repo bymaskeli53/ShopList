@@ -18,13 +18,15 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun ItemRow(
-    item: ShoppingItem,
-    onToggle: (ShoppingItem) -> Unit,
+fun ListRow(
+    list: ShoppingListUI,
+    onClick: (ShoppingListUI) -> Unit,
+    onToggle: (ShoppingListUI) -> Unit,
     backgroundColor: Color,
     textColor: Color,
     accentColor: Color
@@ -33,7 +35,7 @@ fun ItemRow(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 72.dp) // Minimum touch target
-            .clickable { onToggle(item) },
+            .clickable { onClick(list) },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = backgroundColor
@@ -50,42 +52,51 @@ fun ItemRow(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Item content
+            // List content
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 16.dp)
-                    .alpha(if (item.bought) 0.5f else 1f)
+                    .alpha(if (list.bought) 0.5f else 1f)
             ) {
+                // Show items as comma-separated list
+                val itemsText = list.items.joinToString(", ") { item ->
+                    if (item.amount.isNotBlank()) {
+                        "${item.amount} ${item.title}"
+                    } else {
+                        item.title
+                    }
+                }
+
                 Text(
-                    text = item.title,
+                    text = itemsText,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     color = textColor,
-                    textDecoration = if (item.bought) TextDecoration.LineThrough else null
+                    textDecoration = if (list.bought) TextDecoration.LineThrough else null,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
 
-                if (item.amount.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = item.amount,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = textColor.copy(alpha = 0.7f),
-                        textDecoration = if (item.bought) TextDecoration.LineThrough else null
-                    )
-                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "${list.items.size} ürün",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = textColor.copy(alpha = 0.6f)
+                )
             }
 
             // Checkbox icon with minimum touch target
             Box(
                 modifier = Modifier
-                    .size(48.dp), // Minimum 48dp touch target
+                    .size(48.dp) // Minimum 48dp touch target
+                    .clickable(onClick = { onToggle(list) }),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = if (item.bought) Icons.Filled.CheckCircle else Icons.Outlined.Circle,
-                    contentDescription = if (item.bought) "Marked as bought" else "Not bought",
-                    tint = if (item.bought) accentColor else textColor.copy(alpha = 0.5f),
+                    imageVector = if (list.bought) Icons.Filled.CheckCircle else Icons.Outlined.Circle,
+                    contentDescription = if (list.bought) "Alındı olarak işaretle" else "Alınmadı",
+                    tint = if (list.bought) accentColor else textColor.copy(alpha = 0.5f),
                     modifier = Modifier.size(32.dp)
                 )
             }

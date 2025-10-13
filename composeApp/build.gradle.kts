@@ -1,6 +1,4 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,15 +6,11 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
-    androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
-    }
+    androidTarget()
     
     listOf(
         iosX64(),
@@ -35,7 +29,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
-
+            implementation(libs.sqldelight.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -46,13 +40,13 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
+            implementation(libs.composeMaterialIconsExtended)
             implementation(libs.lifecycle.viewmodel.compose)
             implementation(libs.androidx.lifecycle.runtime)
             implementation(libs.lifecycle.runtime.compose)
             implementation(libs.navigation.compose)
-
-
+            implementation(libs.sqldelight.runtime)
+            implementation(libs.sqldelight.coroutines)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -60,6 +54,10 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+            implementation(libs.sqldelight.jvm)
+        }
+        iosMain.dependencies {
+            implementation(libs.sqldelight.native)
         }
     }
 }
@@ -93,6 +91,14 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+}
+
+sqldelight {
+    databases {
+        create("ShopListDatabase") {
+            packageName.set("com.gundogar.shoplist.database")
+        }
+    }
 }
 
 compose.desktop {

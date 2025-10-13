@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
@@ -18,12 +17,12 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShoppingListScreen(
-    items: List<ShoppingItem>,
-    onToggleBought: (ShoppingItem) -> Unit = {},
-    onAddItem: (String) -> Unit = {},
+    lists: List<ShoppingListUI>,
+    onToggleBought: (ShoppingListUI) -> Unit = {},
+    onListClick: (ShoppingListUI) -> Unit = {},
+    onNavigateToAdd: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var newText by remember { mutableStateOf("") }
 
     // High-contrast color scheme
     val backgroundColor = Color(0xFF000000) // Pure black
@@ -51,12 +50,7 @@ fun ShoppingListScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-                    if (newText.isNotBlank()) {
-                        onAddItem(newText)
-                        newText = ""
-                    }
-                },
+                onClick = onNavigateToAdd,
                 containerColor = accentColor,
                 contentColor = Color.Black,
                 modifier = Modifier.size(64.dp) // Minimum 48dp touch target
@@ -77,52 +71,45 @@ fun ShoppingListScreen(
                 .background(backgroundColor)
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
-            // Input field with improved styling
-            OutlinedTextField(
-                value = newText,
-                onValueChange = { newText = it },
-                placeholder = {
-                    Text(
-                        "Yeni madde ekle...",
-                        color = textSecondary
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 56.dp), // Minimum touch target height
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = textPrimary,
-                    unfocusedTextColor = textPrimary,
-                    focusedBorderColor = accentColor,
-                    unfocusedBorderColor = textSecondary,
-                    cursorColor = accentColor,
-                    focusedContainerColor = surfaceColor,
-                    unfocusedContainerColor = surfaceColor
-                ),
-                shape = RoundedCornerShape(12.dp),
-                textStyle = MaterialTheme.typography.bodyLarge
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Item count indicator
-            if (items.isNotEmpty()) {
+            // List count indicator
+            if (lists.isNotEmpty()) {
                 Text(
-                    text = "${items.size} madde",
+                    text = "${lists.size} liste",
                     style = MaterialTheme.typography.labelMedium,
                     color = textSecondary,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
+            } else {
+                // Empty state
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 32.dp),
+                    horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Henüz liste eklenmedi",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = textSecondary,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Text(
+                        text = "Sağ alttaki + butonuna tıklayarak başlayın",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = textSecondary.copy(alpha = 0.7f)
+                    )
+                }
             }
 
-            // Shopping list
+            // Shopping lists
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(items) { item ->
-                    ItemRow(
-                        item = item,
+                items(lists) { list ->
+                    ListRow(
+                        list = list,
+                        onClick = { onListClick(it) },
                         onToggle = { onToggleBought(it) },
                         backgroundColor = surfaceColor,
                         textColor = textPrimary,
@@ -139,4 +126,16 @@ fun ShoppingListScreen(
     }
 }
 
-data class ShoppingItem(val id: String, val title: String, val amount: String = "", val bought: Boolean = false)
+// UI Models
+data class ShoppingListUI(
+    val id: String,
+    val items: List<ShoppingListItemUI>,
+    val bought: Boolean = false,
+    val createdAt: Long
+)
+
+data class ShoppingListItemUI(
+    val id: String,
+    val title: String,
+    val amount: String = ""
+)
