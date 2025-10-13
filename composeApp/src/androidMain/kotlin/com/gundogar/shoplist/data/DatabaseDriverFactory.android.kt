@@ -11,7 +11,7 @@ actual class DatabaseDriverFactory(private val context: Context) {
         return AndroidSqliteDriver(
             schema = ShopListDatabase.Schema,
             context = context,
-            name = "shoplist_v3.db",  // Changed database name to force schema recreation with updatedAt
+            name = "shoplist_v4.db",  // Changed database name to force schema recreation
             callback = object : AndroidSqliteDriver.Callback(ShopListDatabase.Schema) {
                 override fun onOpen(db: SupportSQLiteDatabase) {
                     super.onOpen(db)

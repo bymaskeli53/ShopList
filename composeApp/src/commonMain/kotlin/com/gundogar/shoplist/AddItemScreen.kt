@@ -17,9 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.benasher44.uuid.uuid4
 
 data class ItemEntry(
-    val id: String = java.util.UUID.randomUUID().toString(),
+    val id: String = uuid4().toString(),
     val title: String = "",
     val amount: String = ""
 )

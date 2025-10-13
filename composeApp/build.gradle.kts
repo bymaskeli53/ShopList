@@ -19,7 +19,6 @@ kotlin {
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
-            isStatic = true
         }
     }
     
@@ -47,6 +46,8 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.sqldelight.runtime)
             implementation(libs.sqldelight.coroutines)
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.uuid)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

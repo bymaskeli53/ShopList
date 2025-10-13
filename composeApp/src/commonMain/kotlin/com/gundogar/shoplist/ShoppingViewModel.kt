@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.UUID
+import com.benasher44.uuid.uuid4
 
 class ShoppingViewModel(
     private val repository: ShoppingRepository
@@ -46,7 +46,7 @@ class ShoppingViewModel(
         if (items.isEmpty()) return
 
         viewModelScope.launch {
-            val listId = UUID.randomUUID().toString()
+            val listId = uuid4().toString()
             repository.insertListWithItems(listId, items)
         }
     }

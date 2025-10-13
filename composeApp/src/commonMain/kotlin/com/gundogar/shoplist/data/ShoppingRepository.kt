@@ -4,9 +4,12 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.gundogar.shoplist.database.ShopListDatabase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
+import com.benasher44.uuid.uuid4
 
 data class ShoppingListWithItems(
     val listId: String,
@@ -26,7 +29,7 @@ class ShoppingRepository(databaseDriverFactory: DatabaseDriverFactory) {
     private val queries = database.shoppingItemQueries
 
     fun getAllListsWithItems(): Flow<List<ShoppingListWithItems>> {
-        return queries.getAllLists().asFlow().mapToList(Dispatchers.Default).map { lists ->
+        return queries.getAllLists().asFlow().mapToList(Dispatchers.IO).map { lists ->
             lists.map { list ->
                 val items = queries.getItemsForList(list.id).executeAsList().map { item ->
                     ShoppingListItemData(
@@ -65,9 +68,9 @@ class ShoppingRepository(databaseDriverFactory: DatabaseDriverFactory) {
     suspend fun insertListWithItems(
         listId: String,
         items: List<Pair<String, String>>  // title, amount pairs
-    ) = withContext(Dispatchers.Default) {
+    ) = withContext(Dispatchers.IO) {
         queries.transaction {
-            val timestamp = System.currentTimeMillis()
+            val timestamp = Clock.System.now().toEpochMilliseconds()
             // Insert the list
             queries.insertList(
                 id = listId,
@@ -79,7 +82,7 @@ class ShoppingRepository(databaseDriverFactory: DatabaseDriverFactory) {
             // Insert all items
             items.forEachIndexed { index, (title, amount) ->
                 queries.insertListItem(
-                    id = java.util.UUID.randomUUID().toString(),
+                    id = uuid4().toString(),
                     listId = listId,
                     title = title,
                     amount = amount,
@@ -92,7 +95,7 @@ class ShoppingRepository(databaseDriverFactory: DatabaseDriverFactory) {
     suspend fun updateListItems(
         listId: String,
         items: List<ShoppingListItemData>
-    ) = withContext(Dispatchers.Default) {
+    ) = withContext(Dispatchers.IO) {
         try {
             queries.transaction {
                 // Delete all existing items for this list
@@ -101,7 +104,7 @@ class ShoppingRepository(databaseDriverFactory: DatabaseDriverFactory) {
                 // Insert updated items with new IDs to avoid conflicts
                 items.forEachIndexed { index, item ->
                     queries.insertListItem(
-                        id = java.util.UUID.randomUUID().toString(),  // Generate new UUID for each item
+                        id = uuid4().toString(),  // Generate new UUID for each item
                         listId = listId,
                         title = item.title,
                         amount = item.amount,
@@ -111,7 +114,7 @@ class ShoppingRepository(databaseDriverFactory: DatabaseDriverFactory) {
 
                 // Touch the list to trigger Flow update
                 queries.touchList(
-                    updatedAt = System.currentTimeMillis(),
+                    updatedAt = Clock.System.now().toEpochMilliseconds(),
                     id = listId
                 )
             }
@@ -122,11 +125,11 @@ class ShoppingRepository(databaseDriverFactory: DatabaseDriverFactory) {
         }
     }
 
-    suspend fun updateListBoughtStatus(listId: String, bought: Boolean) = withContext(Dispatchers.Default) {
+    suspend fun updateListBoughtStatus(listId: String, bought: Boolean) = withContext(Dispatchers.IO) {
         queries.updateListBoughtStatus(bought = if (bought) 1L else 0L, id = listId)
     }
 
-    suspend fun deleteList(listId: String) = withContext(Dispatchers.Default) {
+    suspend fun deleteList(listId: String) = withContext(Dispatchers.IO) {
         queries.deleteList(listId)
     }
 }

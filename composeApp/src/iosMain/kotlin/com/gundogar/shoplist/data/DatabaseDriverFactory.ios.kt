@@ -6,6 +6,6 @@ import com.gundogar.shoplist.database.ShopListDatabase
 
 actual class DatabaseDriverFactory {
     actual fun createDriver(): SqlDriver {
-        return NativeSqliteDriver(ShopListDatabase.Schema, "shoplist_v3.db")
+        return NativeSqliteDriver(ShopListDatabase.Schema, "shoplist_v4.db")
     }
 }

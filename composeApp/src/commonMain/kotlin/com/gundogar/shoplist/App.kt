@@ -41,8 +41,11 @@ fun App(databaseDriverFactory: DatabaseDriverFactory) {
 
             composable(
                 route = "detail/{listId}"
-            ) { backStackEntry ->
-                val listId = backStackEntry.arguments?.getString("listId")
+            ) { navBackStackEntry ->
+                // Extract listId from the route
+                val route = navBackStackEntry.destination.route ?: ""
+                val listId = route.substringAfter("detail/").substringBefore("/")
+                    .ifEmpty { navBackStackEntry.id.substringAfterLast("/") }
                 // Re-find the list from the reactive StateFlow on every recomposition
                 val list = lists.find { it.id == listId }
 
