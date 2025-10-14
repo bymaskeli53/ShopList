@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.gundogar.shoplist.tts.TextToSpeechManager
 import kotlinx.coroutines.launch
 
 
@@ -31,9 +32,17 @@ fun ShoppingListScreen(
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    val ttsManager = remember { TextToSpeechManager() }
 
     // Track recently deleted list for undo
     var deletedList by remember { mutableStateOf<ShoppingListUI?>(null) }
+
+    // Clean up TTS when leaving the screen
+    DisposableEffect(Unit) {
+        onDispose {
+            ttsManager.shutdown()
+        }
+    }
 
     // High-contrast color scheme
     val backgroundColor = Color(0xFF000000) // Pure black
@@ -182,6 +191,24 @@ fun ShoppingListScreen(
                             list = list,
                             onClick = { onListClick(it) },
                             onToggle = { onToggleBought(it) },
+                            onSpeak = { list ->
+                                // Create a spoken text from the list items
+                                val spokenText = buildString {
+                                    append("Alışveriş listenizde. ")
+                                    list.items.forEachIndexed { index, item ->
+                                        if (item.amount.isNotBlank()) {
+                                            append("${item.amount} ${item.title}")
+                                        } else {
+                                            append(item.title)
+                                        }
+                                        if (index < list.items.size - 1) {
+                                            append(", ")
+                                        }
+                                    }
+                                    append("Bulunmaktadır")
+                                }
+                                ttsManager.speak(spokenText)
+                            },
                             backgroundColor = surfaceColor,
                             textColor = textPrimary,
                             accentColor = accentColor

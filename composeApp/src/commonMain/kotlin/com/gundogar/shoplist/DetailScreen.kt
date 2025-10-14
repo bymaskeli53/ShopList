@@ -4,19 +4,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.gundogar.shoplist.tts.TextToSpeechManager
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +34,14 @@ fun DetailScreen(
     }
 
     val scope = rememberCoroutineScope()
+    val ttsManager = remember { TextToSpeechManager() }
+
+    // Clean up TTS when leaving the screen
+    DisposableEffect(Unit) {
+        onDispose {
+            ttsManager.shutdown()
+        }
+    }
 
     // High-contrast color scheme matching AddItemScreen
     val backgroundColor = Color(0xFF000000)
@@ -68,6 +75,35 @@ fun DetailScreen(
                     }
                 },
                 actions = {
+                    // TTS button
+                    IconButton(
+                        onClick = {
+                            val spokenText = buildString {
+                                append("Alışveriş listenizde. ")
+                                items.filter { it.title.isNotBlank() }.forEachIndexed { index, item ->
+                                    if (item.amount.isNotBlank()) {
+                                        append("${item.amount} ${item.title}")
+                                    } else {
+                                        append(item.title)
+                                    }
+                                    if (index < items.size - 1) {
+                                        append(", ")
+                                    }
+                                }
+                                append("Bulunmaktadır")
+                            }
+                            ttsManager.speak(spokenText)
+                        },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.VolumeUp,
+                            contentDescription = "Listeyi oku",
+                            tint = accentColor,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+
                     // Add new item button
                     IconButton(
                         onClick = { items = items + ItemEntry() },

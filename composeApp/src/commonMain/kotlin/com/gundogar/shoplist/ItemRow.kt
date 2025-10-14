@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +29,7 @@ fun ListRow(
     list: ShoppingListUI,
     onClick: (ShoppingListUI) -> Unit,
     onToggle: (ShoppingListUI) -> Unit,
+    onSpeak: (ShoppingListUI) -> Unit = {},
     backgroundColor: Color,
     textColor: Color,
     accentColor: Color
@@ -86,19 +89,38 @@ fun ListRow(
                 )
             }
 
-            // Checkbox icon with minimum touch target
-            Box(
-                modifier = Modifier
-                    .size(48.dp) // Minimum 48dp touch target
-                    .clickable(onClick = { onToggle(list) }),
-                contentAlignment = Alignment.Center
+            // Action buttons row
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = if (list.bought) Icons.Filled.CheckCircle else Icons.Outlined.Circle,
-                    contentDescription = if (list.bought) "Alındı olarak işaretle" else "Alınmadı",
-                    tint = if (list.bought) accentColor else textColor.copy(alpha = 0.5f),
-                    modifier = Modifier.size(32.dp)
-                )
+                // TTS button
+                IconButton(
+                    onClick = { onSpeak(list) },
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.VolumeUp,
+                        contentDescription = "Listeyi oku",
+                        tint = accentColor,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                // Checkbox icon with minimum touch target
+                Box(
+                    modifier = Modifier
+                        .size(48.dp) // Minimum 48dp touch target
+                        .clickable(onClick = { onToggle(list) }),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = if (list.bought) Icons.Filled.CheckCircle else Icons.Outlined.Circle,
+                        contentDescription = if (list.bought) "Alındı olarak işaretle" else "Alınmadı",
+                        tint = if (list.bought) accentColor else textColor.copy(alpha = 0.5f),
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
             }
         }
     }
