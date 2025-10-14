@@ -28,7 +28,9 @@ fun App(databaseDriverFactory: DatabaseDriverFactory) {
                     lists = lists,
                     onToggleBought = { list -> viewModel.toggleListBought(list) },
                     onListClick = { list -> navController.navigate("detail/${list.id}") },
-                    onNavigateToAdd = { navController.navigate("add_item") }
+                    onNavigateToAdd = { navController.navigate("add_item") },
+                    onDeleteList = { list -> viewModel.deleteList(list.id) },
+                    onRestoreList = { list -> viewModel.restoreList(list) }
                 )
             }
 

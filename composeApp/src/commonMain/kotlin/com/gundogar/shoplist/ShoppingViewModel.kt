@@ -86,4 +86,22 @@ class ShoppingViewModel(
             repository.deleteList(listId)
         }
     }
+
+    fun restoreList(list: ShoppingListUI) {
+        viewModelScope.launch {
+            val items = list.items.map { item ->
+                ShoppingListItemData(
+                    id = item.id,
+                    title = item.title,
+                    amount = item.amount
+                )
+            }
+            repository.restoreList(
+                listId = list.id,
+                bought = list.bought,
+                createdAt = list.createdAt,
+                items = items
+            )
+        }
+    }
 }

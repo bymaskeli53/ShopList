@@ -132,4 +132,33 @@ class ShoppingRepository(databaseDriverFactory: DatabaseDriverFactory) {
     suspend fun deleteList(listId: String) = withContext(Dispatchers.IO) {
         queries.deleteList(listId)
     }
+
+    suspend fun restoreList(
+        listId: String,
+        bought: Boolean,
+        createdAt: Long,
+        items: List<ShoppingListItemData>
+    ) = withContext(Dispatchers.IO) {
+        queries.transaction {
+            val timestamp = Clock.System.now().toEpochMilliseconds()
+            // Re-insert the list
+            queries.insertList(
+                id = listId,
+                bought = if (bought) 1L else 0L,
+                createdAt = createdAt,  // Use original creation time
+                updatedAt = timestamp
+            )
+
+            // Re-insert all items
+            items.forEachIndexed { index, item ->
+                queries.insertListItem(
+                    id = item.id,  // Use original item IDs
+                    listId = listId,
+                    title = item.title,
+                    amount = item.amount,
+                    position = index.toLong()
+                )
+            }
+        }
+    }
 }

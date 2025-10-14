@@ -4,14 +4,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -21,8 +25,15 @@ fun ShoppingListScreen(
     onToggleBought: (ShoppingListUI) -> Unit = {},
     onListClick: (ShoppingListUI) -> Unit = {},
     onNavigateToAdd: () -> Unit = {},
+    onDeleteList: (ShoppingListUI) -> Unit = {},
+    onRestoreList: (ShoppingListUI) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Track recently deleted list for undo
+    var deletedList by remember { mutableStateOf<ShoppingListUI?>(null) }
 
     // High-contrast color scheme
     val backgroundColor = Color(0xFF000000) // Pure black
@@ -30,6 +41,7 @@ fun ShoppingListScreen(
     val accentColor = Color(0xFF00E676) // Bright green
     val textPrimary = Color(0xFFFFFFFF) // White text
     val textSecondary = Color(0xFFB0B0B0) // Light gray text
+    val deleteColor = Color(0xFFFF5252) // Red for delete
 
     Scaffold(
         topBar = {
@@ -61,6 +73,9 @@ fun ShoppingListScreen(
                     modifier = Modifier.size(32.dp)
                 )
             }
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         },
         containerColor = backgroundColor
     ) { padding ->
@@ -106,15 +121,72 @@ fun ShoppingListScreen(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(lists) { list ->
-                    ListRow(
-                        list = list,
-                        onClick = { onListClick(it) },
-                        onToggle = { onToggleBought(it) },
-                        backgroundColor = surfaceColor,
-                        textColor = textPrimary,
-                        accentColor = accentColor
+                items(
+                    items = lists,
+                    key = { list -> list.id }
+                ) { list ->
+                    val dismissState = rememberSwipeToDismissBoxState(
+                        confirmValueChange = { dismissValue ->
+                            if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
+                                // Store the deleted list
+                                deletedList = list
+
+                                // Delete the list
+                                onDeleteList(list)
+
+                                // Show snackbar with undo option
+                                scope.launch {
+                                    val result = snackbarHostState.showSnackbar(
+                                        message = "Liste silindi",
+                                        actionLabel = "Geri Al",
+                                        duration = SnackbarDuration.Short
+                                    )
+
+                                    if (result == SnackbarResult.ActionPerformed) {
+                                        // Undo: restore the list
+                                        deletedList?.let { restoredList ->
+                                            onRestoreList(restoredList)
+                                        }
+                                    }
+                                    deletedList = null
+                                }
+                                true
+                            } else {
+                                false
+                            }
+                        }
                     )
+
+                    SwipeToDismissBox(
+                        state = dismissState,
+                        backgroundContent = {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(deleteColor, RoundedCornerShape(16.dp))
+                                    .padding(horizontal = 20.dp),
+                                contentAlignment = Alignment.CenterEnd
+                            ) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "Sil",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+                        },
+                        enableDismissFromStartToEnd = false,
+                        enableDismissFromEndToStart = true
+                    ) {
+                        ListRow(
+                            list = list,
+                            onClick = { onListClick(it) },
+                            onToggle = { onToggleBought(it) },
+                            backgroundColor = surfaceColor,
+                            textColor = textPrimary,
+                            accentColor = accentColor
+                        )
+                    }
                 }
 
                 // Bottom padding for FAB
