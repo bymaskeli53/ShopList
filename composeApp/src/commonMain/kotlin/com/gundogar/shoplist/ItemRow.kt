@@ -62,24 +62,56 @@ fun ListRow(
                     .padding(end = 16.dp)
                     .alpha(if (list.bought) 0.5f else 1f)
             ) {
-                // Show items as comma-separated list
-                val itemsText = list.items.joinToString(", ") { item ->
-                    if (item.amount.isNotBlank()) {
-                        "${item.amount} ${item.title}"
-                    } else {
-                        item.title
-                    }
-                }
+                // Show list title if available, otherwise show items
+                if (list.title.isNotBlank()) {
+                    Text(
+                        text = list.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = textColor,
+                        textDecoration = if (list.bought) TextDecoration.LineThrough else null,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
 
-                Text(
-                    text = itemsText,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                    color = textColor,
-                    textDecoration = if (list.bought) TextDecoration.LineThrough else null,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    // Show first few items as preview
+                    val itemsPreview = list.items.take(2).joinToString(", ") { item ->
+                        if (item.amount.isNotBlank()) {
+                            "${item.amount} ${item.title}"
+                        } else {
+                            item.title
+                        }
+                    } + if (list.items.size > 2) "..." else ""
+
+                    Text(
+                        text = itemsPreview,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = textColor.copy(alpha = 0.7f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                } else {
+                    // Fallback: Show items as comma-separated list
+                    val itemsText = list.items.joinToString(", ") { item ->
+                        if (item.amount.isNotBlank()) {
+                            "${item.amount} ${item.title}"
+                        } else {
+                            item.title
+                        }
+                    }
+
+                    Text(
+                        text = itemsText,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = textColor,
+                        textDecoration = if (list.bought) TextDecoration.LineThrough else null,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(

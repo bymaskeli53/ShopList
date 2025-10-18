@@ -29,9 +29,10 @@ data class ItemEntry(
 @Composable
 fun AddItemScreen(
     onNavigateBack: () -> Unit,
-    onCreateList: (List<Pair<String, String>>) -> Unit,
+    onCreateList: (String, List<Pair<String, String>>) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var listTitle by remember { mutableStateOf("") }
     var items by remember { mutableStateOf(listOf(ItemEntry())) }
 
     // High-contrast color scheme matching ShoppingListScreen
@@ -73,7 +74,7 @@ fun AddItemScreen(
                     ) {
                         Icon(
                             Icons.Default.Add,
-                            contentDescription = "Yeni satır ekle",
+                            contentDescription = "Yeni ürün ekle",
                             tint = accentColor,
                             modifier = Modifier.size(24.dp)
                         )
@@ -93,11 +94,11 @@ fun AddItemScreen(
                         val itemsToAdd = items
                             .filter { it.title.isNotBlank() }
                             .map { it.title to it.amount }
-                        onCreateList(itemsToAdd)
+                        onCreateList(listTitle, itemsToAdd)
                         onNavigateBack()
                     },
                     containerColor = accentColor,
-                    contentColor = Color.Black,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(64.dp)
                 ) {
                     Icon(
@@ -124,18 +125,48 @@ fun AddItemScreen(
                     .padding(20.dp)
             ) {
                 Text(
-                    text = "${items.size} satır",
+                    text = "${items.size} ürün",
                     style = MaterialTheme.typography.labelLarge,
                     color = textPrimary,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Sağ üstteki + ile yeni satır ekleyin",
+                    text = "Sağ üstteki + ile yeni ürün ekleyin",
                     style = MaterialTheme.typography.bodySmall,
                     color = textSecondary
                 )
             }
+
+            // List Title Input
+            OutlinedTextField(
+                value = listTitle,
+                onValueChange = { listTitle = it },
+                label = { Text("Liste Başlığı", color = textSecondary) },
+                placeholder = { Text("Örn: Haftalık Alışveriş", color = textSecondary.copy(alpha = 0.6f)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 16.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = textPrimary,
+                    unfocusedTextColor = textPrimary,
+                    focusedBorderColor = accentColor,
+                    unfocusedBorderColor = textSecondary.copy(alpha = 0.5f),
+                    focusedLabelColor = accentColor,
+                    unfocusedLabelColor = textSecondary,
+                    cursorColor = accentColor,
+                    focusedContainerColor = surfaceColor,
+                    unfocusedContainerColor = surfaceColor
+                ),
+                shape = RoundedCornerShape(12.dp),
+                textStyle = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            HorizontalDivider(color = Color.DarkGray)
 
             // Item list
             LazyColumn(

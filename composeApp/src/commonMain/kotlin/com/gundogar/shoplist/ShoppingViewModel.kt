@@ -27,6 +27,7 @@ class ShoppingViewModel(
                 _lists.value = dbLists.map { dbList ->
                     ShoppingListUI(
                         id = dbList.listId,
+                        title = dbList.title,
                         items = dbList.items.map { item ->
                             ShoppingListItemUI(
                                 id = item.id,
@@ -42,12 +43,12 @@ class ShoppingViewModel(
         }
     }
 
-    fun createList(items: List<Pair<String, String>>) {
+    fun createList(items: List<Pair<String, String>>, title: String = "") {
         if (items.isEmpty()) return
 
         viewModelScope.launch {
             val listId = uuid4().toString()
-            repository.insertListWithItems(listId, items)
+            repository.insertListWithItems(listId, title, items)
         }
     }
 
@@ -64,7 +65,11 @@ class ShoppingViewModel(
         }
     }
 
-    suspend fun updateListItemsSuspend(listId: String, items: List<ShoppingListItemUI>) {
+    suspend fun updateListItemsSuspend(listId: String, listTitle: String, items: List<ShoppingListItemUI>) {
+        // Update title
+        repository.updateListTitle(listId, listTitle)
+
+        // Update items
         val dataItems = items.map { item ->
             ShoppingListItemData(
                 id = item.id,
@@ -98,6 +103,7 @@ class ShoppingViewModel(
             }
             repository.restoreList(
                 listId = list.id,
+                title = list.title,
                 bought = list.bought,
                 createdAt = list.createdAt,
                 items = items

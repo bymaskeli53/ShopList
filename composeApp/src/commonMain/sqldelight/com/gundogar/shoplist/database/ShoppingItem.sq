@@ -1,6 +1,7 @@
 -- Shopping List table (main list)
 CREATE TABLE ShoppingList (
     id TEXT PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL DEFAULT '',
     bought INTEGER NOT NULL DEFAULT 0,
     createdAt INTEGER NOT NULL,
     updatedAt INTEGER NOT NULL DEFAULT 0
@@ -34,8 +35,8 @@ WHERE id = ?;
 
 -- Insert a new shopping list
 insertList:
-INSERT INTO ShoppingList(id, bought, createdAt, updatedAt)
-VALUES (?, ?, ?, ?);
+INSERT INTO ShoppingList(id, title, bought, createdAt, updatedAt)
+VALUES (?, ?, ?, ?, ?);
 
 -- Insert a shopping list item
 insertListItem:
@@ -46,6 +47,12 @@ VALUES (?, ?, ?, ?, ?);
 updateListBoughtStatus:
 UPDATE ShoppingList
 SET bought = ?
+WHERE id = ?;
+
+-- Update list title
+updateListTitle:
+UPDATE ShoppingList
+SET title = ?, updatedAt = ?
 WHERE id = ?;
 
 -- Touch list to trigger Flow update

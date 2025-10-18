@@ -8,12 +8,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.gundogar.shoplist.data.DatabaseDriverFactory
 import com.gundogar.shoplist.data.ShoppingRepository
+import com.gundogar.shoplist.ui.theme.ShopListTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
 fun App(databaseDriverFactory: DatabaseDriverFactory) {
-    MaterialTheme {
+    ShopListTheme {
         val navController = rememberNavController()
         val repository = remember { ShoppingRepository(databaseDriverFactory) }
         val viewModel: ShoppingViewModel = viewModel { ShoppingViewModel(repository) }
@@ -37,7 +38,7 @@ fun App(databaseDriverFactory: DatabaseDriverFactory) {
             composable("add_item") {
                 AddItemScreen(
                     onNavigateBack = { navController.popBackStack() },
-                    onCreateList = { items -> viewModel.createList(items) }
+                    onCreateList = { title, items -> viewModel.createList(items, title) }
                 )
             }
 
@@ -54,9 +55,9 @@ fun App(databaseDriverFactory: DatabaseDriverFactory) {
                     DetailScreen(
                         list = list,
                         onNavigateBack = { navController.popBackStack() },
-                        onSave = { id: String, items: List<ShoppingListItemUI> ->
+                        onSave = { id: String, title: String, items: List<ShoppingListItemUI> ->
                             // This is now a suspend function that waits for update to complete
-                            viewModel.updateListItemsSuspend(id, items)
+                            viewModel.updateListItemsSuspend(id, title, items)
                         }
                     )
                 }

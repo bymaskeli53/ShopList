@@ -98,7 +98,7 @@ fun ShoppingListScreen(
             // List count indicator
             if (lists.isNotEmpty()) {
                 Text(
-                    text = "${lists.size} liste",
+                    text = "${lists.size} adet listeniz var",
                     style = MaterialTheme.typography.labelMedium,
                     color = textSecondary,
                     modifier = Modifier.padding(bottom = 12.dp)
@@ -228,6 +228,7 @@ fun ShoppingListScreen(
 // UI Models
 data class ShoppingListUI(
     val id: String,
+    val title: String,
     val items: List<ShoppingListItemUI>,
     val bought: Boolean = false,
     val createdAt: Long

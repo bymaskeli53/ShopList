@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -23,7 +24,7 @@ import kotlinx.coroutines.launch
 fun DetailScreen(
     list: ShoppingListUI,
     onNavigateBack: () -> Unit,
-    onSave: suspend (String, List<ShoppingListItemUI>) -> Unit,
+    onSave: suspend (String, String, List<ShoppingListItemUI>) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // Use remember with key to reset when list changes
@@ -32,6 +33,8 @@ fun DetailScreen(
             ItemEntry(id = it.id, title = it.title, amount = it.amount)
         })
     }
+
+    var listTitle by remember(list.id) { mutableStateOf(list.title) }
 
     val scope = rememberCoroutineScope()
     val ttsManager = remember { TextToSpeechManager() }
@@ -111,7 +114,7 @@ fun DetailScreen(
                     ) {
                         Icon(
                             Icons.Default.Add,
-                            contentDescription = "Yeni satır ekle",
+                            contentDescription = "Yeni ürün ekle",
                             tint = accentColor,
                             modifier = Modifier.size(24.dp)
                         )
@@ -139,7 +142,7 @@ fun DetailScreen(
                                     )
                                 }
                             // Wait for the save to complete
-                            onSave(list.id, updatedItems)
+                            onSave(list.id, listTitle, updatedItems)
                             // Navigate back after saving completes
                             onNavigateBack()
                         }
@@ -172,18 +175,47 @@ fun DetailScreen(
                     .padding(20.dp)
             ) {
                 Text(
-                    text = "${items.size} satır",
+                    text = "${items.size} ürün",
                     style = MaterialTheme.typography.labelLarge,
                     color = textPrimary,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Sağ üstteki + ile yeni satır ekleyin",
+                    text = "Sağ üstteki + ile yeni ürün ekleyin",
                     style = MaterialTheme.typography.bodySmall,
                     color = textSecondary
                 )
             }
+
+            // List Title Input
+            OutlinedTextField(
+                value = listTitle,
+                onValueChange = { listTitle = it },
+                label = { Text("Liste Başlığı", color = textSecondary) },
+                placeholder = { Text("Örn: Haftalık Alışveriş", color = textSecondary.copy(alpha = 0.6f)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 16.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = textPrimary,
+                    unfocusedTextColor = textPrimary,
+                    focusedBorderColor = accentColor,
+                    unfocusedBorderColor = textSecondary.copy(alpha = 0.5f),
+                    focusedLabelColor = accentColor,
+                    unfocusedLabelColor = textSecondary,
+                    cursorColor = accentColor,
+                    focusedContainerColor = surfaceColor,
+                    unfocusedContainerColor = surfaceColor
+                ),
+                shape = RoundedCornerShape(12.dp),
+                textStyle = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
 
             // Item list
             LazyColumn(

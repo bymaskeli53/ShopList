@@ -13,6 +13,7 @@ import com.benasher44.uuid.uuid4
 
 data class ShoppingListWithItems(
     val listId: String,
+    val title: String,
     val bought: Boolean,
     val createdAt: Long,
     val items: List<ShoppingListItemData>
@@ -40,6 +41,7 @@ class ShoppingRepository(databaseDriverFactory: DatabaseDriverFactory) {
                 }
                 ShoppingListWithItems(
                     listId = list.id,
+                    title = list.title,
                     bought = list.bought == 1L,
                     createdAt = list.createdAt,
                     items = items
@@ -59,6 +61,7 @@ class ShoppingRepository(databaseDriverFactory: DatabaseDriverFactory) {
         }
         ShoppingListWithItems(
             listId = list.id,
+            title = list.title,
             bought = list.bought == 1L,
             createdAt = list.createdAt,
             items = items
@@ -67,6 +70,7 @@ class ShoppingRepository(databaseDriverFactory: DatabaseDriverFactory) {
 
     suspend fun insertListWithItems(
         listId: String,
+        title: String,
         items: List<Pair<String, String>>  // title, amount pairs
     ) = withContext(Dispatchers.IO) {
         queries.transaction {
@@ -74,6 +78,7 @@ class ShoppingRepository(databaseDriverFactory: DatabaseDriverFactory) {
             // Insert the list
             queries.insertList(
                 id = listId,
+                title = title,
                 bought = 0L,
                 createdAt = timestamp,
                 updatedAt = timestamp
@@ -129,12 +134,21 @@ class ShoppingRepository(databaseDriverFactory: DatabaseDriverFactory) {
         queries.updateListBoughtStatus(bought = if (bought) 1L else 0L, id = listId)
     }
 
+    suspend fun updateListTitle(listId: String, title: String) = withContext(Dispatchers.IO) {
+        queries.updateListTitle(
+            title = title,
+            updatedAt = Clock.System.now().toEpochMilliseconds(),
+            id = listId
+        )
+    }
+
     suspend fun deleteList(listId: String) = withContext(Dispatchers.IO) {
         queries.deleteList(listId)
     }
 
     suspend fun restoreList(
         listId: String,
+        title: String,
         bought: Boolean,
         createdAt: Long,
         items: List<ShoppingListItemData>
@@ -144,6 +158,7 @@ class ShoppingRepository(databaseDriverFactory: DatabaseDriverFactory) {
             // Re-insert the list
             queries.insertList(
                 id = listId,
+                title = title,
                 bought = if (bought) 1L else 0L,
                 createdAt = createdAt,  // Use original creation time
                 updatedAt = timestamp
