@@ -1,5 +1,11 @@
 package com.gundogar.shoplist
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.repeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,9 +20,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -34,6 +45,25 @@ fun ListRow(
     textColor: Color,
     accentColor: Color
 ) {
+
+    var isSpeaking by remember { mutableStateOf(false) }
+
+    val tintColor by animateColorAsState(
+        targetValue = if (isSpeaking) Color(0xFF00E676)  else Color(0xFFB0B0B0),
+        animationSpec = tween(300)
+    )
+
+    val iconScale by animateFloatAsState(
+        targetValue = if (isSpeaking) 1.4f else 1f,
+        animationSpec = repeatable(
+            animation = tween(600),
+            repeatMode = RepeatMode.Restart,
+            iterations = 1
+        ),
+        finishedListener = {
+            isSpeaking = false
+        }
+    )
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -128,14 +158,17 @@ fun ListRow(
             ) {
                 // TTS button
                 IconButton(
-                    onClick = { onSpeak(list) },
+                    onClick = {
+                        onSpeak(list)
+                        isSpeaking = !isSpeaking
+                              },
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Filled.VolumeUp,
                         contentDescription = "Listeyi oku",
                         tint = accentColor,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp).scale(iconScale)
                     )
                 }
 

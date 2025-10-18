@@ -1,5 +1,9 @@
 package com.gundogar.shoplist
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -22,7 +26,7 @@ fun App(databaseDriverFactory: DatabaseDriverFactory) {
 
         NavHost(
             navController = navController,
-            startDestination = "shopping_list"
+            startDestination = "shopping_list",
         ) {
             composable("shopping_list") {
                 ShoppingListScreen(

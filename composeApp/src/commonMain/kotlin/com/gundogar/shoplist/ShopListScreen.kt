@@ -2,7 +2,10 @@ package com.gundogar.shoplist
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -41,6 +44,7 @@ fun ShoppingListScreen(
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val ttsManager = remember { TextToSpeechManager() }
+
 
     // Track recently deleted list for undo
     var deletedList by remember { mutableStateOf<ShoppingListUI?>(null) }
