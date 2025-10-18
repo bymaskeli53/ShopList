@@ -1,6 +1,13 @@
 package com.gundogar.shoplist
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -94,7 +101,7 @@ fun ShoppingListScreen(
             }
         },
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            AnimatedSnackbarHost(hostState = snackbarHostState)
         },
         containerColor = backgroundColor
     ) { padding ->
@@ -144,6 +151,14 @@ fun ShoppingListScreen(
                     items = lists,
                     key = { list -> list.id }
                 ) { list ->
+//                    AnimatedVisibility(
+//                        visible = true,
+//                        enter = fadeIn(animationSpec = tween(300)) + slideInVertically(initialOffsetY = {it / 2}),
+//                        exit = fadeOut(animationSpec = tween(300)) + slideOutVertically(targetOffsetY = {-it / 2})
+//
+//                    ) {
+
+
                     val dismissState = rememberSwipeToDismissBoxState(
                         confirmValueChange = { dismissValue ->
                             if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
@@ -173,7 +188,17 @@ fun ShoppingListScreen(
                             } else {
                                 false
                             }
-                        }
+                        },
+                        positionalThreshold = { distance -> distance * 0.12f }
+
+                    )
+
+                    val backgroundColor by animateColorAsState(
+                        targetValue = when (dismissState.targetValue) {
+                            SwipeToDismissBoxValue.EndToStart -> deleteColor
+                            else -> Color.Transparent
+                        },
+                        animationSpec = tween(300)
                     )
 
                     SwipeToDismissBox(
@@ -182,7 +207,7 @@ fun ShoppingListScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .background(deleteColor, RoundedCornerShape(16.dp))
+                                    .background(backgroundColor, RoundedCornerShape(16.dp))
                                     .padding(horizontal = 20.dp),
                                 contentAlignment = Alignment.CenterEnd
                             ) {
@@ -225,6 +250,7 @@ fun ShoppingListScreen(
                         )
                     }
                 }
+           //  }
 
                 // Bottom padding for FAB
                 item {
@@ -249,3 +275,26 @@ data class ShoppingListItemUI(
     val title: String,
     val amount: String = ""
 )
+
+// Already using SnackbarHost, but can enhance with custom animation
+@Composable
+fun AnimatedSnackbarHost(hostState: SnackbarHostState) {
+    SnackbarHost(
+        hostState = hostState,
+        snackbar = { data ->
+            var visible by remember { mutableStateOf(false) }
+
+            LaunchedEffect(Unit) {
+                visible = true
+            }
+
+            AnimatedVisibility(
+                visible = visible,
+                enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
+                exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
+            ) {
+                Snackbar(containerColor = Color(0xFF33B186),snackbarData = data)
+            }
+        }
+    )
+}
