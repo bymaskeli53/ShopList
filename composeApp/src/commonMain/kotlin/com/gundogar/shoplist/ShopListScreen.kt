@@ -1,5 +1,6 @@
 package com.gundogar.shoplist
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -70,11 +71,20 @@ fun ShoppingListScreen(
             )
         },
         floatingActionButton = {
+            var isPressed by remember { mutableStateOf(false) }
+
+            val size by animateDpAsState(
+                targetValue = if (isPressed) 76.dp else 64.dp
+            )
+
             FloatingActionButton(
-                onClick = onNavigateToAdd,
+                onClick = {
+                    isPressed = !isPressed
+                    onNavigateToAdd.invoke()
+                },
                 containerColor = accentColor,
                 contentColor = Color.Black,
-                modifier = Modifier.size(64.dp) // Minimum 48dp touch target
+                modifier = Modifier.size(size) // Minimum 48dp touch target
             ) {
                 Icon(
                     Icons.Default.Add,

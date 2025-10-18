@@ -1,5 +1,6 @@
 package com.gundogar.shoplist
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -87,6 +89,8 @@ fun AddItemScreen(
             )
         },
         floatingActionButton = {
+
+
             val hasValidItems = items.any { it.title.isNotBlank() }
             if (hasValidItems) {
                 FloatingActionButton(
@@ -143,7 +147,12 @@ fun AddItemScreen(
                 value = listTitle,
                 onValueChange = { listTitle = it },
                 label = { Text("Liste Başlığı", color = textSecondary) },
-                placeholder = { Text("Örn: Haftalık Alışveriş", color = textSecondary.copy(alpha = 0.6f)) },
+                placeholder = {
+                    Text(
+                        "Örn: Haftalık Alışveriş",
+                        color = textSecondary.copy(alpha = 0.6f)
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)

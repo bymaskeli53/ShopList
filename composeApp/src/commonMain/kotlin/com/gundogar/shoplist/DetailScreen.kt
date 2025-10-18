@@ -1,5 +1,6 @@
 package com.gundogar.shoplist
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -127,10 +129,16 @@ fun DetailScreen(
             )
         },
         floatingActionButton = {
+            var isPressed by remember { mutableStateOf(false) }
+
+            val size by animateDpAsState(
+                targetValue = if (isPressed) 76.dp else 64.dp
+            )
             val hasValidItems = items.any { it.title.isNotBlank() }
             if (hasValidItems) {
                 FloatingActionButton(
                     onClick = {
+                        isPressed = !isPressed
                         scope.launch {
                             val updatedItems = items
                                 .filter { it.title.isNotBlank() }
@@ -149,7 +157,7 @@ fun DetailScreen(
                     },
                     containerColor = accentColor,
                     contentColor = Color.Black,
-                    modifier = Modifier.size(64.dp)
+                    modifier = Modifier.size(size)
                 ) {
                     Icon(
                         Icons.Default.Check,
