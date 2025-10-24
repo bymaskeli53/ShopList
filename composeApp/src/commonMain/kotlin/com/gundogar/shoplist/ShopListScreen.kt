@@ -18,7 +18,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -45,6 +47,23 @@ fun ShoppingListScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val ttsManager = remember { TextToSpeechManager() }
 
+    // Search state
+    var searchQuery by remember { mutableStateOf("") }
+    var isSearchActive by remember { mutableStateOf(false) }
+
+    // Filter lists based on search query
+    val filteredLists = remember(lists, searchQuery) {
+        if (searchQuery.isBlank()) {
+            lists
+        } else {
+            lists.filter { list ->
+                list.title.contains(searchQuery, ignoreCase = true) ||
+                list.items.any { item ->
+                    item.title.contains(searchQuery, ignoreCase = true)
+                }
+            }
+        }
+    }
 
     // Track recently deleted list for undo
     var deletedList by remember { mutableStateOf<ShoppingListUI?>(null) }
@@ -116,10 +135,55 @@ fun ShoppingListScreen(
                 .background(backgroundColor)
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
+            // Search bar
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                placeholder = { Text("Liste ara...", color = textSecondary.copy(alpha = 0.6f)) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = "Ara",
+                        tint = accentColor
+                    )
+                },
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { searchQuery = "" }) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Temizle",
+                                tint = textSecondary
+                            )
+                        }
+                    }
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = textPrimary,
+                    unfocusedTextColor = textPrimary,
+                    focusedBorderColor = accentColor,
+                    unfocusedBorderColor = textSecondary.copy(alpha = 0.5f),
+                    focusedLeadingIconColor = accentColor,
+                    unfocusedLeadingIconColor = textSecondary,
+                    cursorColor = accentColor,
+                    focusedContainerColor = surfaceColor,
+                    unfocusedContainerColor = surfaceColor
+                ),
+                shape = RoundedCornerShape(12.dp),
+                singleLine = true
+            )
+
             // List count indicator
             if (lists.isNotEmpty()) {
                 Text(
-                    text = "${lists.size} adet listeniz var",
+                    text = if (searchQuery.isEmpty()) {
+                        "${lists.size} adet listeniz var"
+                    } else {
+                        "${filteredLists.size} sonuç bulundu"
+                    },
                     style = MaterialTheme.typography.labelMedium,
                     color = textSecondary,
                     modifier = Modifier.padding(bottom = 12.dp)
@@ -152,7 +216,7 @@ fun ShoppingListScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(
-                    items = lists,
+                    items = filteredLists,
                     key = { list -> list.id }
                 ) { list ->
 //                    AnimatedVisibility(
