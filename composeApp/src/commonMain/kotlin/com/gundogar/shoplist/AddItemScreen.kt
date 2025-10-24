@@ -1,6 +1,13 @@
 package com.gundogar.shoplist
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +27,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.benasher44.uuid.uuid4
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 data class ItemEntry(
     val id: String = uuid4().toString(),
@@ -35,7 +44,13 @@ fun AddItemScreen(
     modifier: Modifier = Modifier
 ) {
     var listTitle by remember { mutableStateOf("") }
-    var items by remember { mutableStateOf(listOf(ItemEntry())) }
+    val initialItem = remember { ItemEntry() }
+    var items by remember { mutableStateOf(listOf(initialItem)) }
+    var visibleItems by remember { mutableStateOf(mapOf(initialItem.id to true)) }
+    val scope = rememberCoroutineScope()
+
+
+
 
     // High-contrast color scheme matching ShoppingListScreen
     val backgroundColor = Color(0xFF000000)
@@ -71,7 +86,18 @@ fun AddItemScreen(
                 actions = {
                     // Add new item button
                     IconButton(
-                        onClick = { items = items + ItemEntry() },
+                        onClick = {
+                            val newItem = ItemEntry()
+                            // Add to items list
+                            items = items + newItem
+                            // Start with invisible
+                            visibleItems = visibleItems + (newItem.id to false)
+                            // Then make visible after a frame to trigger animation
+                            scope.launch {
+                                delay(50)
+                                visibleItems = visibleItems + (newItem.id to true)
+                            }
+                        },
                         modifier = Modifier.size(48.dp)
                     ) {
                         Icon(
@@ -189,30 +215,48 @@ fun AddItemScreen(
                     items = items,
                     key = { _, item -> item.id }
                 ) { index, item ->
-                    ItemEntryCard(
-                        item = item,
-                        index = index,
-                        onTitleChange = { newTitle ->
-                            items = items.toMutableList().apply {
-                                this[index] = this[index].copy(title = newTitle)
-                            }
-                        },
-                        onAmountChange = { newAmount ->
-                            items = items.toMutableList().apply {
-                                this[index] = this[index].copy(amount = newAmount)
-                            }
-                        },
-                        onDelete = {
-                            if (items.size > 1) {
-                                items = items.filterIndexed { i, _ -> i != index }
-                            }
-                        },
-                        canDelete = items.size > 1,
-                        surfaceColor = surfaceColor,
-                        accentColor = accentColor,
-                        textPrimary = textPrimary,
-                        textSecondary = textSecondary
-                    )
+                    AnimatedVisibility(
+                        visible = visibleItems[item.id] ?: true,
+                        enter = fadeIn(animationSpec = tween(300)) + slideInVertically(
+                            initialOffsetY = { -it / 2 },
+                            animationSpec = tween(300)
+                        ),
+                        exit = fadeOut(animationSpec = tween(300)) + slideOutVertically(
+                            targetOffsetY = { it / 2 },
+                            animationSpec = tween(300)
+                        )
+                    ) {
+                        ItemEntryCard(
+                            item = item,
+                            index = index,
+                            onTitleChange = { newTitle ->
+                                items = items.toMutableList().apply {
+                                    this[index] = this[index].copy(title = newTitle)
+                                }
+                            },
+                            onAmountChange = { newAmount ->
+                                items = items.toMutableList().apply {
+                                    this[index] = this[index].copy(amount = newAmount)
+                                }
+                            },
+                            onDelete = {
+                                if (items.size > 1) {
+                                    // Hide with animation first
+                                    visibleItems = visibleItems + (item.id to false)
+                                    // Remove from list after animation completes
+                                    scope.launch {
+                                        delay(300) // Match animation duration
+                                        items = items.filterIndexed { i, _ -> i != index }
+                                    }
+                                }
+                            },
+                            canDelete = items.size > 1,
+                            surfaceColor = surfaceColor,
+                            accentColor = accentColor,
+                            textPrimary = textPrimary,
+                            textSecondary = textSecondary
+                        )
+                    }
                 }
 
                 // Bottom padding for FAB
