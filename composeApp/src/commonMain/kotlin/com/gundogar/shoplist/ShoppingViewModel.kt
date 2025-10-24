@@ -35,7 +35,7 @@ class ShoppingViewModel(
                                 amount = item.amount
                             )
                         },
-                        bought = dbList.bought,
+                        isCompleted = dbList.bought,
                         createdAt = dbList.createdAt
                     )
                 }
@@ -65,7 +65,7 @@ class ShoppingViewModel(
         }
     }
 
-    suspend fun updateListItemsSuspend(listId: String, listTitle: String, items: List<ShoppingListItemUI>) {
+    suspend fun updateList(listId: String, listTitle: String, items: List<ShoppingListItemUI>) {
         // Update title
         repository.updateListTitle(listId, listTitle)
 
@@ -80,9 +80,9 @@ class ShoppingViewModel(
         repository.updateListItems(listId, dataItems)
     }
 
-    fun toggleListBought(list: ShoppingListUI) {
+    fun toggleListCompleted(list: ShoppingListUI) {
         viewModelScope.launch {
-            repository.updateListBoughtStatus(list.id, !list.bought)
+            repository.updateListBoughtStatus(list.id, !list.isCompleted)
         }
     }
 
@@ -104,7 +104,7 @@ class ShoppingViewModel(
             repository.restoreList(
                 listId = list.id,
                 title = list.title,
-                bought = list.bought,
+                bought = list.isCompleted,
                 createdAt = list.createdAt,
                 items = items
             )

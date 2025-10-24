@@ -30,7 +30,7 @@ import com.benasher44.uuid.uuid4
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-data class ItemEntry(
+data class ShoppingItemInput(
     val id: String = uuid4().toString(),
     val title: String = "",
     val amount: String = ""
@@ -44,7 +44,7 @@ fun AddItemScreen(
     modifier: Modifier = Modifier
 ) {
     var listTitle by remember { mutableStateOf("") }
-    val initialItem = remember { ItemEntry() }
+    val initialItem = remember { ShoppingItemInput() }
     var items by remember { mutableStateOf(listOf(initialItem)) }
     var visibleItems by remember { mutableStateOf(mapOf(initialItem.id to true)) }
     val scope = rememberCoroutineScope()
@@ -87,7 +87,7 @@ fun AddItemScreen(
                     // Add new item button
                     IconButton(
                         onClick = {
-                            val newItem = ItemEntry()
+                            val newItem = ShoppingItemInput()
                             // Add to items list
                             items = items + newItem
                             // Start with invisible
@@ -270,7 +270,7 @@ fun AddItemScreen(
 
 @Composable
 fun ItemEntryCard(
-    item: ItemEntry,
+    item: ShoppingItemInput,
     index: Int,
     onTitleChange: (String) -> Unit,
     onAmountChange: (String) -> Unit,

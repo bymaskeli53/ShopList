@@ -40,7 +40,7 @@ fun ListRow(
     list: ShoppingListUI,
     onClick: (ShoppingListUI) -> Unit,
     onToggle: (ShoppingListUI) -> Unit,
-    onSpeak: (ShoppingListUI) -> Unit = {},
+    onReadAloud: (ShoppingListUI) -> Unit = {},
     backgroundColor: Color,
     textColor: Color,
     accentColor: Color
@@ -90,7 +90,7 @@ fun ListRow(
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 16.dp)
-                    .alpha(if (list.bought) 0.5f else 1f)
+                    .alpha(if (list.isCompleted) 0.5f else 1f)
             ) {
                 // Show list title if available, otherwise show items
                 if (list.title.isNotBlank()) {
@@ -99,7 +99,7 @@ fun ListRow(
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = textColor,
-                        textDecoration = if (list.bought) TextDecoration.LineThrough else null,
+                        textDecoration = if (list.isCompleted) TextDecoration.LineThrough else null,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -137,7 +137,7 @@ fun ListRow(
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium,
                         color = textColor,
-                        textDecoration = if (list.bought) TextDecoration.LineThrough else null,
+                        textDecoration = if (list.isCompleted) TextDecoration.LineThrough else null,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -159,7 +159,7 @@ fun ListRow(
                 // TTS button
                 IconButton(
                     onClick = {
-                        onSpeak(list)
+                        onReadAloud(list)
                         isSpeaking = !isSpeaking
                               },
                     modifier = Modifier.size(48.dp)
@@ -180,9 +180,9 @@ fun ListRow(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = if (list.bought) Icons.Filled.CheckCircle else Icons.Outlined.Circle,
-                        contentDescription = if (list.bought) "Alındı olarak işaretle" else "Alınmadı",
-                        tint = if (list.bought) accentColor else textColor.copy(alpha = 0.5f),
+                        imageVector = if (list.isCompleted) Icons.Filled.CheckCircle else Icons.Outlined.Circle,
+                        contentDescription = if (list.isCompleted) "Tamamlandı" else "Tamamlanmadı",
+                        tint = if (list.isCompleted) accentColor else textColor.copy(alpha = 0.5f),
                         modifier = Modifier.size(32.dp)
                     )
                 }

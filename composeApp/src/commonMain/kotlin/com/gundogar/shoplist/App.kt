@@ -31,7 +31,7 @@ fun App(databaseDriverFactory: DatabaseDriverFactory) {
             composable("shopping_list") {
                 ShoppingListScreen(
                     lists = lists,
-                    onToggleBought = { list -> viewModel.toggleListBought(list) },
+                    onToggleCompleted = { list -> viewModel.toggleListCompleted(list) },
                     onListClick = { list -> navController.navigate("detail/${list.id}") },
                     onNavigateToAdd = { navController.navigate("add_item") },
                     onDeleteList = { list -> viewModel.deleteList(list.id) },
@@ -61,7 +61,7 @@ fun App(databaseDriverFactory: DatabaseDriverFactory) {
                         onNavigateBack = { navController.popBackStack() },
                         onSave = { id: String, title: String, items: List<ShoppingListItemUI> ->
                             // This is now a suspend function that waits for update to complete
-                            viewModel.updateListItemsSuspend(id, title, items)
+                            viewModel.updateList(id, title, items)
                         }
                     )
                 }

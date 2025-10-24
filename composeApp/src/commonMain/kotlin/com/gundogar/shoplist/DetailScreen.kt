@@ -40,11 +40,11 @@ fun DetailScreen(
     // Use remember with key to reset when list changes
     var items by remember(list.id, list.items) {
         mutableStateOf(list.items.map {
-            ItemEntry(id = it.id, title = it.title, amount = it.amount)
+            ShoppingItemInput(id = it.id, title = it.title, amount = it.amount)
         })
     }
 
-    val initialItem = remember { ItemEntry() }
+    val initialItem = remember { ShoppingItemInput() }
 
     var listTitle by remember(list.id) { mutableStateOf(list.title) }
 
@@ -126,7 +126,7 @@ fun DetailScreen(
                     // Add new item button
                     IconButton(
                         onClick = {
-                            val newItem = ItemEntry()
+                            val newItem = ShoppingItemInput()
                             items = items + newItem
 
                             visibleItems = visibleItems + (newItem.id to false)

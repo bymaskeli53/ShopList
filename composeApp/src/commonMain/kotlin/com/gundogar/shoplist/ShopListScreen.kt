@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ShoppingListScreen(
     lists: List<ShoppingListUI>,
-    onToggleBought: (ShoppingListUI) -> Unit = {},
+    onToggleCompleted: (ShoppingListUI) -> Unit = {},
     onListClick: (ShoppingListUI) -> Unit = {},
     onNavigateToAdd: () -> Unit = {},
     onDeleteList: (ShoppingListUI) -> Unit = {},
@@ -293,8 +293,8 @@ fun ShoppingListScreen(
                         ListRow(
                             list = list,
                             onClick = { onListClick(it) },
-                            onToggle = { onToggleBought(it) },
-                            onSpeak = { list ->
+                            onToggle = { onToggleCompleted(it) },
+                            onReadAloud = { list ->
                                 // Create a spoken text from the list items
                                 val spokenText = buildString {
                                     append("Alışveriş listenizde. ")
@@ -334,7 +334,7 @@ data class ShoppingListUI(
     val id: String,
     val title: String,
     val items: List<ShoppingListItemUI>,
-    val bought: Boolean = false,
+    val isCompleted: Boolean = false,
     val createdAt: Long
 )
 
