@@ -2,7 +2,7 @@
 CREATE TABLE ShoppingList (
     id TEXT PRIMARY KEY NOT NULL,
     title TEXT NOT NULL DEFAULT '',
-    bought INTEGER NOT NULL DEFAULT 0,
+    isCompleted INTEGER NOT NULL DEFAULT 0,
     createdAt INTEGER NOT NULL,
     updatedAt INTEGER NOT NULL DEFAULT 0
 );
@@ -35,7 +35,7 @@ WHERE id = ?;
 
 -- Insert a new shopping list
 insertList:
-INSERT INTO ShoppingList(id, title, bought, createdAt, updatedAt)
+INSERT INTO ShoppingList(id, title, isCompleted, createdAt, updatedAt)
 VALUES (?, ?, ?, ?, ?);
 
 -- Insert a shopping list item
@@ -43,10 +43,10 @@ insertListItem:
 INSERT INTO ShoppingListItem(id, listId, title, amount, position)
 VALUES (?, ?, ?, ?, ?);
 
--- Update list bought status
-updateListBoughtStatus:
+-- Update list completion status
+updateListCompletionStatus:
 UPDATE ShoppingList
-SET bought = ?
+SET isCompleted = ?
 WHERE id = ?;
 
 -- Update list title

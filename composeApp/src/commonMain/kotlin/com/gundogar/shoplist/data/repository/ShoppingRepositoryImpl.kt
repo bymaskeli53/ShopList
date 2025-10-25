@@ -41,7 +41,7 @@ class ShoppingRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Sho
                 ShoppingListEntity(
                     listId = list.id,
                     title = list.title,
-                    bought = list.bought == 1L,
+                    isCompleted = list.isCompleted == 1L,
                     createdAt = list.createdAt,
                     items = items
                 ).toDomain()
@@ -61,7 +61,7 @@ class ShoppingRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Sho
         ShoppingListEntity(
             listId = list.id,
             title = list.title,
-            bought = list.bought == 1L,
+            isCompleted = list.isCompleted == 1L,
             createdAt = list.createdAt,
             items = items
         ).toDomain()
@@ -78,7 +78,7 @@ class ShoppingRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Sho
             queries.insertList(
                 id = listId,
                 title = title,
-                bought = 0L,
+                isCompleted = 0L,
                 createdAt = timestamp,
                 updatedAt = timestamp
             )
@@ -138,7 +138,7 @@ class ShoppingRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Sho
     }
 
     override suspend fun toggleListCompleted(listId: String, isCompleted: Boolean) = withContext(Dispatchers.IO) {
-        queries.updateListBoughtStatus(bought = if (isCompleted) 1L else 0L, id = listId)
+        queries.updateListCompletionStatus(isCompleted = if (isCompleted) 1L else 0L, id = listId)
     }
 
     override suspend fun deleteList(listId: String) = withContext(Dispatchers.IO) {
@@ -152,7 +152,7 @@ class ShoppingRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Sho
             queries.insertList(
                 id = list.id,
                 title = list.title,
-                bought = if (list.isCompleted) 1L else 0L,
+                isCompleted = if (list.isCompleted) 1L else 0L,
                 createdAt = list.createdAt,
                 updatedAt = timestamp
             )

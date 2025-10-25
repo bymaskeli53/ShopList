@@ -3,10 +3,11 @@ package com.gundogar.shoplist.domain.model
 import com.benasher44.uuid.uuid4
 
 /**
- * Form input state for creating/editing shopping items
+ * Form state for creating/editing shopping items
+ * Represents transient data during item input/editing before saving
  * Used in AddItemScreen and DetailScreen
  */
-data class ShoppingItemInput(
+data class ShoppingItemFormState(
     val id: String = uuid4().toString(),
     val title: String = "",
     val amount: String = ""

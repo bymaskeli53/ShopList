@@ -65,7 +65,7 @@ fun ShoppingListScreen(
     }
 
     // Track recently deleted list for undo
-    var deletedList by remember { mutableStateOf<ShoppingList?>(null) }
+    var lastDeletedList by remember { mutableStateOf<ShoppingList?>(null) }
 
     // Clean up TTS when leaving the screen
     DisposableEffect(Unit) {
@@ -230,7 +230,7 @@ fun ShoppingListScreen(
                         confirmValueChange = { dismissValue ->
                             if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
                                 // Store the deleted list
-                                deletedList = list
+                                lastDeletedList = list
 
                                 // Delete the list
                                 onDeleteList(list)
@@ -245,11 +245,11 @@ fun ShoppingListScreen(
 
                                     if (result == SnackbarResult.ActionPerformed) {
                                         // Undo: restore the list
-                                        deletedList?.let { restoredList ->
+                                        lastDeletedList?.let { restoredList ->
                                             onRestoreList(restoredList)
                                         }
                                     }
-                                    deletedList = null
+                                    lastDeletedList = null
                                 }
                                 true
                             } else {
@@ -260,7 +260,7 @@ fun ShoppingListScreen(
 
                     )
 
-                    val backgroundColor by animateColorAsState(
+                    val dismissBackgroundColor by animateColorAsState(
                         targetValue = when (dismissState.targetValue) {
                             SwipeToDismissBoxValue.EndToStart -> deleteColor
                             else -> Color.Transparent
@@ -274,7 +274,7 @@ fun ShoppingListScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .background(backgroundColor, RoundedCornerShape(16.dp))
+                                    .background(dismissBackgroundColor, RoundedCornerShape(16.dp))
                                     .padding(horizontal = 20.dp),
                                 contentAlignment = Alignment.CenterEnd
                             ) {

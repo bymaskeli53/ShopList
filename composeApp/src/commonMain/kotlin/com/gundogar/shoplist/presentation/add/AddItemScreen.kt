@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.gundogar.shoplist.domain.model.ShoppingItemInput
+import com.gundogar.shoplist.domain.model.ShoppingItemFormState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -38,9 +38,9 @@ fun AddItemScreen(
     modifier: Modifier = Modifier
 ) {
     var listTitle by remember { mutableStateOf("") }
-    val initialItem = remember { ShoppingItemInput() }
+    val initialItem = remember { ShoppingItemFormState() }
     var items by remember { mutableStateOf(listOf(initialItem)) }
-    var visibleItems by remember { mutableStateOf(mapOf(initialItem.id to true)) }
+    var itemAnimationStates by remember { mutableStateOf(mapOf(initialItem.id to true)) }
     val scope = rememberCoroutineScope()
 
 
@@ -81,15 +81,15 @@ fun AddItemScreen(
                     // Add new item button
                     IconButton(
                         onClick = {
-                            val newItem = ShoppingItemInput()
+                            val newItem = ShoppingItemFormState()
                             // Add to items list
                             items = items + newItem
                             // Start with invisible
-                            visibleItems = visibleItems + (newItem.id to false)
+                            itemAnimationStates = itemAnimationStates + (newItem.id to false)
                             // Then make visible after a frame to trigger animation
                             scope.launch {
                                 delay(50)
-                                visibleItems = visibleItems + (newItem.id to true)
+                                itemAnimationStates = itemAnimationStates + (newItem.id to true)
                             }
                         },
                         modifier = Modifier.size(48.dp)
@@ -210,7 +210,7 @@ fun AddItemScreen(
                     key = { _, item -> item.id }
                 ) { index, item ->
                     AnimatedVisibility(
-                        visible = visibleItems[item.id] ?: true,
+                        visible = itemAnimationStates[item.id] ?: true,
                         enter = fadeIn(animationSpec = tween(300)) + slideInVertically(
                             initialOffsetY = { -it / 2 },
                             animationSpec = tween(300)
@@ -236,7 +236,7 @@ fun AddItemScreen(
                             onDelete = {
                                 if (items.size > 1) {
                                     // Hide with animation first
-                                    visibleItems = visibleItems + (item.id to false)
+                                    itemAnimationStates = itemAnimationStates + (item.id to false)
                                     // Remove from list after animation completes
                                     scope.launch {
                                         delay(300) // Match animation duration
@@ -264,7 +264,7 @@ fun AddItemScreen(
 
 @Composable
 fun ItemEntryCard(
-    item: ShoppingItemInput,
+    item: ShoppingItemFormState,
     index: Int,
     onTitleChange: (String) -> Unit,
     onAmountChange: (String) -> Unit,

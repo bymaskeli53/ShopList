@@ -10,7 +10,7 @@ import com.gundogar.shoplist.domain.model.ShoppingList
 data class ShoppingListEntity(
     val listId: String,
     val title: String,
-    val bought: Boolean,
+    val isCompleted: Boolean,
     val createdAt: Long,
     val items: List<ShoppingItemEntity>
 )
@@ -32,7 +32,7 @@ fun ShoppingListEntity.toDomain(): ShoppingList {
         id = listId,
         title = title,
         items = items.map { it.toDomain() },
-        isCompleted = bought,
+        isCompleted = isCompleted,
         createdAt = createdAt
     )
 }
@@ -57,7 +57,7 @@ fun ShoppingList.toEntity(): ShoppingListEntity {
     return ShoppingListEntity(
         listId = id,
         title = title,
-        bought = isCompleted,
+        isCompleted = isCompleted,
         createdAt = createdAt,
         items = items.map { it.toEntity() }
     )
