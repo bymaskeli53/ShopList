@@ -11,6 +11,6 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "ShopList",
     ) {
-        App(DatabaseDriverFactory())
+        App()
     }
 }

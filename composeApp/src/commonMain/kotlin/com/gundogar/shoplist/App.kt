@@ -20,12 +20,10 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 @Preview
-fun App(databaseDriverFactory: DatabaseDriverFactory) {
+fun App() {
     ShopListTheme {
         val navController = rememberNavController()
 
-        // Initialize repository
-        val repository: ShoppingRepository = remember { ShoppingRepositoryImpl(databaseDriverFactory) }
 
         // Initialize ViewModels
         val listViewModel: ShoppingListViewModel = koinViewModel()
