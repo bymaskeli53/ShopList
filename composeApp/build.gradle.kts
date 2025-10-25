@@ -29,6 +29,8 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.sqldelight.android)
+            implementation(libs.koin.android)
+            implementation(libs.koin.androidx.compose)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -41,6 +43,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.composeMaterialIconsExtended)
             implementation(libs.lifecycle.viewmodel.compose)
+            implementation(libs.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime)
             implementation(libs.lifecycle.runtime.compose)
             implementation(libs.navigation.compose)
@@ -48,6 +51,10 @@ kotlin {
             implementation(libs.sqldelight.coroutines)
             implementation(libs.kotlinx.datetime)
             implementation(libs.uuid)
+            api(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.koin.composeVM)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

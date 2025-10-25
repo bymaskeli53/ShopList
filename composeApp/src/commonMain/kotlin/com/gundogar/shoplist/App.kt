@@ -16,6 +16,7 @@ import com.gundogar.shoplist.presentation.list.ShoppingListScreen
 import com.gundogar.shoplist.presentation.list.ShoppingListViewModel
 import com.gundogar.shoplist.presentation.theme.ShopListTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 @Preview
@@ -27,9 +28,9 @@ fun App(databaseDriverFactory: DatabaseDriverFactory) {
         val repository: ShoppingRepository = remember { ShoppingRepositoryImpl(databaseDriverFactory) }
 
         // Initialize ViewModels
-        val listViewModel: ShoppingListViewModel = viewModel { ShoppingListViewModel(repository) }
-        val addViewModel: AddItemViewModel = viewModel { AddItemViewModel(repository) }
-        val detailViewModel: DetailViewModel = viewModel { DetailViewModel(repository) }
+        val listViewModel: ShoppingListViewModel = koinViewModel()
+        val addViewModel: AddItemViewModel = koinViewModel()
+        val detailViewModel: DetailViewModel = koinViewModel()
 
         // Observe lists from ViewModel
         val lists by listViewModel.lists.collectAsState()
