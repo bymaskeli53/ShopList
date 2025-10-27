@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,6 +30,7 @@ import com.gundogar.shoplist.domain.model.ShoppingItem
 import com.gundogar.shoplist.domain.model.ShoppingItemFormState
 import com.gundogar.shoplist.domain.model.ShoppingList
 import com.gundogar.shoplist.presentation.add.ItemEntryCard
+import com.gundogar.shoplist.util.share.ShareManager
 import com.gundogar.shoplist.util.tts.TextToSpeechManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -58,6 +60,7 @@ fun DetailScreen(
 
     val scope = rememberCoroutineScope()
     val ttsManager: TextToSpeechManager = koinInject()
+    val shareManager: ShareManager = koinInject()
 
     // Clean up TTS when leaving the screen
     DisposableEffect(Unit) {
@@ -98,6 +101,36 @@ fun DetailScreen(
                     }
                 },
                 actions = {
+                    // Share button
+                    IconButton(
+                        onClick = {
+                            val shareText = buildString {
+                                if (listTitle.isNotBlank()) {
+                                    append("*$listTitle*\n\n")
+                                }
+                                items.filter { it.title.isNotBlank() }
+                                    .forEachIndexed { index, item ->
+                                        append("${index + 1}. ")
+                                        if (item.amount.isNotBlank()) {
+                                            append("${item.amount} ${item.title}")
+                                        } else {
+                                            append(item.title)
+                                        }
+                                        append("\n")
+                                    }
+                            }
+                            shareManager.shareToWhatsApp(shareText)
+                        },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Share,
+                            contentDescription = "WhatsApp'ta paylaş",
+                            tint = accentColor,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+
                     // TTS button
                     IconButton(
                         onClick = {
