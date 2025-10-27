@@ -1,9 +1,14 @@
 package com.gundogar.shoplist.util.tts
 
+import android.content.Context
 import android.speech.tts.TextToSpeech as AndroidTTS
 import java.util.Locale
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-actual class TextToSpeechManager {
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+actual class TextToSpeechManager actual constructor() : KoinComponent {
+    private val context: Context by inject()
     private var tts: AndroidTTS? = null
     private var isInitialized = false
 
@@ -14,16 +19,6 @@ actual class TextToSpeechManager {
     private fun ensureInitialized(onReady: () -> Unit) {
         if (isInitialized) {
             onReady()
-            return
-        }
-
-        // Get the application context
-        val context = try {
-            Class.forName("android.app.ActivityThread")
-                .getMethod("currentApplication")
-                .invoke(null) as android.content.Context
-        } catch (e: Exception) {
-            e.printStackTrace()
             return
         }
 

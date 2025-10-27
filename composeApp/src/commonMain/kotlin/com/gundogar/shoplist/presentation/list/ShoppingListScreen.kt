@@ -29,6 +29,7 @@ import com.gundogar.shoplist.domain.model.ShoppingList
 import com.gundogar.shoplist.presentation.list.components.ListRow
 import com.gundogar.shoplist.util.tts.TextToSpeechManager
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,7 +45,7 @@ fun ShoppingListScreen(
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    val ttsManager = remember { TextToSpeechManager() }
+    val ttsManager: TextToSpeechManager = koinInject()
 
     // Search state
     var searchQuery by remember { mutableStateOf("") }

@@ -32,6 +32,7 @@ import com.gundogar.shoplist.presentation.add.ItemEntryCard
 import com.gundogar.shoplist.util.tts.TextToSpeechManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,7 +57,7 @@ fun DetailScreen(
 
 
     val scope = rememberCoroutineScope()
-    val ttsManager = remember { TextToSpeechManager() }
+    val ttsManager: TextToSpeechManager = koinInject()
 
     // Clean up TTS when leaving the screen
     DisposableEffect(Unit) {
