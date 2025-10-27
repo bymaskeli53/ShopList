@@ -296,7 +296,6 @@ fun ShoppingListScreen(
                             onReadAloud = { list ->
                                 // Create a spoken text from the list items
                                 val spokenText = buildString {
-                                    append("Alışveriş listenizde. ")
                                     list.items.forEachIndexed { index, item ->
                                         if (item.amount.isNotBlank()) {
                                             append("${item.amount} ${item.title}")
@@ -307,7 +306,6 @@ fun ShoppingListScreen(
                                             append(", ")
                                         }
                                     }
-                                    append("Bulunmaktadır")
                                 }
                                 ttsManager.speak(spokenText)
                             },

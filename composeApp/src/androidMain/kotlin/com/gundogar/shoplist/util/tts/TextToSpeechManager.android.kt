@@ -27,13 +27,47 @@ actual class TextToSpeechManager {
             return
         }
 
-        tts = AndroidTTS(context) { status ->
+        // Try to use Google TTS engine explicitly (supports Turkish)
+        val googleTtsEngine = "com.google.android.tts"
+
+        tts = AndroidTTS(context, { status ->
             if (status == AndroidTTS.SUCCESS) {
-                tts?.language = Locale("tr", "TR") // Turkish
-                isInitialized = true
-                onReady()
+                val turkishLocale = Locale("tr", "TR")
+                val result = tts?.setLanguage(turkishLocale)
+
+                // Check if Turkish is available
+                when (result) {
+                    AndroidTTS.LANG_AVAILABLE,
+                    AndroidTTS.LANG_COUNTRY_AVAILABLE,
+                    AndroidTTS.LANG_COUNTRY_VAR_AVAILABLE -> {
+                        println("TTS: Turkish language is available and set successfully (Engine: ${tts?.defaultEngine})")
+                        isInitialized = true
+                        onReady()
+                    }
+                    AndroidTTS.LANG_MISSING_DATA -> {
+                        println("TTS: Turkish language data is missing (Engine: ${tts?.defaultEngine})")
+                        // Try to use default locale as fallback
+                        tts?.setLanguage(turkishLocale)
+                        isInitialized = true
+                        onReady()
+                    }
+                    AndroidTTS.LANG_NOT_SUPPORTED -> {
+                        println("TTS: Turkish language is not supported by engine: ${tts?.defaultEngine}")
+                        println("TTS: Please install Google Text-to-Speech from Play Store or change TTS engine in Settings")
+                        // Fallback to default language
+                        isInitialized = true
+                        onReady()
+                    }
+                    else -> {
+                        println("TTS: Unknown language setup result")
+                        isInitialized = true
+                        onReady()
+                    }
+                }
+            } else {
+                println("TTS: Initialization failed with status: $status")
             }
-        }
+        }, googleTtsEngine)
     }
 
     actual fun speak(text: String) {
