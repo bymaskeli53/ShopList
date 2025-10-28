@@ -73,7 +73,7 @@ ShopList is a **Kotlin Multiplatform** shopping list application that demonstrat
 | Main List Screen | Add List | List Details |
 |:----------------:|:-------------:|:---------------:|
 | ![Android Screenshot 1](docs/screenshots/android_1.png) | ![Android Screenshot 2](docs/screenshots/android_2.png) | ![Android Screenshot 3](docs/screenshots/android_3.png) |
-| View all your shopping lists with smart search | Create and edit lists with quantities | Real-time search across all lists |
+| View all your shopping lists with smart search | Create lists with quantities | Update list detail |
 
 </div>
 
@@ -84,7 +84,7 @@ ShopList is a **Kotlin Multiplatform** shopping list application that demonstrat
 | Main List Screen | Add List | List Details |
 |:----------------:|:-------------:|:------------:|
 | ![iOS Screenshot 1](docs/screenshots/ios_1.png) | ![iOS Screenshot 2](docs/screenshots/ios_3.png) | ![iOS Screenshot 3](docs/screenshots/ios_2.png) |
-| Native iOS experience with shared logic | Seamless list creation | Complete list management |
+| View all your shopping lists with smart search | Create lists with quantities | Update list detail |
 
 </div>
 
