@@ -32,8 +32,8 @@ fun App() {
         val addViewModel: AddItemViewModel = koinViewModel()
         val detailViewModel: DetailViewModel = koinViewModel()
 
-        // Observe lists from ViewModel
-        val lists by listViewModel.lists.collectAsState()
+        // Observe shopping lists from ViewModel
+        val shoppingLists by listViewModel.shoppingLists.collectAsState()
 
         NavHost(
             navController = navController,
@@ -41,20 +41,20 @@ fun App() {
         ) {
             composable("shopping_list") {
                 ShoppingListScreen(
-                    lists = lists,
-                    onToggleCompleted = { list -> listViewModel.toggleListCompleted(list) },
-                    onListClick = { list -> navController.navigate("detail/${list.id}") },
+                    shoppingLists = shoppingLists,
+                    onToggleCompleted = { shoppingList -> listViewModel.toggleShoppingListCompletion(shoppingList) },
+                    onListClick = { shoppingList -> navController.navigate("detail/${shoppingList.id}") },
                     onNavigateToAdd = { navController.navigate("add_item") },
-                    onDeleteList = { list -> listViewModel.deleteList(list.id) },
-                    onRestoreList = { list -> listViewModel.restoreList(list) }
+                    onDeleteList = { shoppingList -> listViewModel.deleteShoppingList(shoppingList.id) },
+                    onRestoreList = { shoppingList -> listViewModel.restoreShoppingList(shoppingList) }
                 )
             }
 
             composable("add_item") {
                 AddItemScreen(
                     onNavigateBack = { navController.popBackStack() },
-                    onCreateList = { title, items ->
-                        addViewModel.createList(title, items)
+                    onCreateList = { listTitle, shoppingItems ->
+                        addViewModel.createShoppingList(listTitle, shoppingItems)
                     }
                 )
             }
@@ -63,14 +63,14 @@ fun App() {
                 route = "detail/{listId}"
             ) { backStackEntry ->
                 val listId = backStackEntry.savedStateHandle.get<String>("listId")
-                val list = lists.find { it.id == listId }
+                val selectedList = shoppingLists.find { it.id == listId }
 
-                if (list != null) {
+                if (selectedList != null) {
                     DetailScreen(
-                        list = list,
+                        shoppingList = selectedList,
                         onNavigateBack = { navController.popBackStack() },
-                        onSave = { id, title, items ->
-                            detailViewModel.updateList(id, title, items)
+                        onSave = { id, listTitle, shoppingItems ->
+                            detailViewModel.updateShoppingList(id, listTitle, shoppingItems)
                         }
                     )
                 }

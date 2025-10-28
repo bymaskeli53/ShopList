@@ -12,7 +12,7 @@ class DetailViewModel(
     private val repository: ShoppingRepository
 ) : ViewModel() {
 
-    suspend fun updateList(listId: String, title: String, items: List<ShoppingItem>) {
-        repository.updateList(listId, title, items)
+    suspend fun updateShoppingList(listId: String, title: String, shoppingItems: List<ShoppingItem>) {
+        repository.updateShoppingList(listId, title, shoppingItems)
     }
 }

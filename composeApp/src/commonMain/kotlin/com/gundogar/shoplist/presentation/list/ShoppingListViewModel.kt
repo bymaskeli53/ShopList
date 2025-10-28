@@ -17,36 +17,36 @@ class ShoppingListViewModel(
     private val repository: ShoppingRepository
 ) : ViewModel() {
 
-    private val _lists = MutableStateFlow<List<ShoppingList>>(emptyList())
-    val lists: StateFlow<List<ShoppingList>> = _lists.asStateFlow()
+    private val _shoppingLists = MutableStateFlow<List<ShoppingList>>(emptyList())
+    val shoppingLists: StateFlow<List<ShoppingList>> = _shoppingLists.asStateFlow()
 
     init {
-        loadLists()
+        loadAllShoppingLists()
     }
 
-    private fun loadLists() {
+    private fun loadAllShoppingLists() {
         viewModelScope.launch {
-            repository.getAllLists().collect { lists ->
-                _lists.value = lists
+            repository.getAllShoppingLists().collect { fetchedLists ->
+                _shoppingLists.value = fetchedLists
             }
         }
     }
 
-    fun toggleListCompleted(list: ShoppingList) {
+    fun toggleShoppingListCompletion(shoppingList: ShoppingList) {
         viewModelScope.launch {
-            repository.toggleListCompleted(list.id, !list.isCompleted)
+            repository.toggleShoppingListCompletion(shoppingList.id, !shoppingList.isCompleted)
         }
     }
 
-    fun deleteList(listId: String) {
+    fun deleteShoppingList(listId: String) {
         viewModelScope.launch {
-            repository.deleteList(listId)
+            repository.deleteShoppingList(listId)
         }
     }
 
-    fun restoreList(list: ShoppingList) {
+    fun restoreShoppingList(shoppingList: ShoppingList) {
         viewModelScope.launch {
-            repository.restoreList(list)
+            repository.restoreShoppingList(shoppingList)
         }
     }
 }

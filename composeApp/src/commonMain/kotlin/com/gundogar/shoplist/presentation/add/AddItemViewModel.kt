@@ -14,12 +14,12 @@ class AddItemViewModel(
     private val repository: ShoppingRepository
 ) : ViewModel() {
 
-    fun createList(title: String, items: List<Pair<String, String>>) {
-        if (items.isEmpty()) return
+    fun createShoppingList(title: String, shoppingItems: List<Pair<String, String>>) {
+        if (shoppingItems.isEmpty()) return
 
         viewModelScope.launch {
-            val listId = uuid4().toString()
-            repository.createList(listId, title, items)
+            val newListId = uuid4().toString()
+            repository.createShoppingList(newListId, title, shoppingItems)
         }
     }
 }

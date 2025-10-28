@@ -36,7 +36,7 @@ import org.koin.compose.koinInject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShoppingListScreen(
-    lists: List<ShoppingList>,
+    shoppingLists: List<ShoppingList>,
     onToggleCompleted: (ShoppingList) -> Unit = {},
     onListClick: (ShoppingList) -> Unit = {},
     onNavigateToAdd: () -> Unit = {},
@@ -53,22 +53,22 @@ fun ShoppingListScreen(
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
 
-    // Filter lists based on search query
-    val filteredLists = remember(lists, searchQuery) {
+    // Filter shopping lists based on search query
+    val filteredShoppingLists = remember(shoppingLists, searchQuery) {
         if (searchQuery.isBlank()) {
-            lists
+            shoppingLists
         } else {
-            lists.filter { list ->
-                list.title.contains(searchQuery, ignoreCase = true) ||
-                list.items.any { item ->
-                    item.title.contains(searchQuery, ignoreCase = true)
+            shoppingLists.filter { shoppingList ->
+                shoppingList.title.contains(searchQuery, ignoreCase = true) ||
+                shoppingList.items.any { shoppingItem ->
+                    shoppingItem.title.contains(searchQuery, ignoreCase = true)
                 }
             }
         }
     }
 
-    // Track recently deleted list for undo
-    var lastDeletedList by remember { mutableStateOf<ShoppingList?>(null) }
+    // Track recently deleted shopping list for undo
+    var lastDeletedShoppingList by remember { mutableStateOf<ShoppingList?>(null) }
 
     // Clean up TTS when leaving the screen
     DisposableEffect(Unit) {
@@ -179,12 +179,12 @@ fun ShoppingListScreen(
             )
 
             // List count indicator
-            if (lists.isNotEmpty()) {
+            if (shoppingLists.isNotEmpty()) {
                 Text(
                     text = if (searchQuery.isEmpty()) {
-                        strings.formatListCount(lists.size)
+                        strings.formatListCount(shoppingLists.size)
                     } else {
-                        strings.formatSearchResults(filteredLists.size)
+                        strings.formatSearchResults(filteredShoppingLists.size)
                     },
                     style = MaterialTheme.typography.labelMedium,
                     color = textSecondary,
@@ -218,9 +218,9 @@ fun ShoppingListScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(
-                    items = filteredLists,
-                    key = { list -> list.id }
-                ) { list ->
+                    items = filteredShoppingLists,
+                    key = { shoppingList -> shoppingList.id }
+                ) { shoppingList ->
 //                    AnimatedVisibility(
 //                        visible = true,
 //                        enter = fadeIn(animationSpec = tween(300)) + slideInVertically(initialOffsetY = {it / 2}),
@@ -232,11 +232,11 @@ fun ShoppingListScreen(
                     val dismissState = rememberSwipeToDismissBoxState(
                         confirmValueChange = { dismissValue ->
                             if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
-                                // Store the deleted list
-                                lastDeletedList = list
+                                // Store the deleted shopping list
+                                lastDeletedShoppingList = shoppingList
 
-                                // Delete the list
-                                onDeleteList(list)
+                                // Delete the shopping list
+                                onDeleteList(shoppingList)
 
                                 // Show snackbar with undo option
                                 scope.launch {
@@ -247,12 +247,12 @@ fun ShoppingListScreen(
                                     )
 
                                     if (result == SnackbarResult.ActionPerformed) {
-                                        // Undo: restore the list
-                                        lastDeletedList?.let { restoredList ->
-                                            onRestoreList(restoredList)
+                                        // Undo: restore the shopping list
+                                        lastDeletedShoppingList?.let { deletedList ->
+                                            onRestoreList(deletedList)
                                         }
                                     }
-                                    lastDeletedList = null
+                                    lastDeletedShoppingList = null
                                 }
                                 true
                             } else {
@@ -293,19 +293,19 @@ fun ShoppingListScreen(
                         enableDismissFromEndToStart = true
                     ) {
                         ListRow(
-                            list = list,
+                            shoppingList = shoppingList,
                             onClick = { onListClick(it) },
                             onToggle = { onToggleCompleted(it) },
-                            onReadAloud = { list ->
-                                // Create a spoken text from the list items
+                            onReadAloud = { selectedList ->
+                                // Create a spoken text from the shopping list items
                                 val spokenText = buildString {
-                                    list.items.forEachIndexed { index, item ->
-                                        if (item.amount.isNotBlank()) {
-                                            append("${item.amount} ${item.title}")
+                                    selectedList.items.forEachIndexed { index, shoppingItem ->
+                                        if (shoppingItem.amount.isNotBlank()) {
+                                            append("${shoppingItem.amount} ${shoppingItem.title}")
                                         } else {
-                                            append(item.title)
+                                            append(shoppingItem.title)
                                         }
-                                        if (index < list.items.size - 1) {
+                                        if (index < selectedList.items.size - 1) {
                                             append(", ")
                                         }
                                     }

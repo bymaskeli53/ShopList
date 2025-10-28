@@ -41,7 +41,7 @@ fun AddItemScreen(
     val strings = LocalStrings.current
     var listTitle by remember { mutableStateOf("") }
     val initialItem = remember { ShoppingItemFormState() }
-    var items by remember { mutableStateOf(listOf(initialItem)) }
+    var shoppingItems by remember { mutableStateOf(listOf(initialItem)) }
     var itemAnimationStates by remember { mutableStateOf(mapOf(initialItem.id to true)) }
     val scope = rememberCoroutineScope()
 
@@ -85,7 +85,7 @@ fun AddItemScreen(
                         onClick = {
                             val newItem = ShoppingItemFormState()
                             // Add to items list
-                            items = items + newItem
+                            shoppingItems = shoppingItems + newItem
                             // Start with invisible
                             itemAnimationStates = itemAnimationStates + (newItem.id to false)
                             // Then make visible after a frame to trigger animation
@@ -113,11 +113,11 @@ fun AddItemScreen(
         floatingActionButton = {
 
 
-            val hasValidItems = items.any { it.title.isNotBlank() }
+            val hasValidItems = shoppingItems.any { it.title.isNotBlank() }
             if (hasValidItems) {
                 FloatingActionButton(
                     onClick = {
-                        val itemsToAdd = items
+                        val itemsToAdd = shoppingItems
                             .filter { it.title.isNotBlank() }
                             .map { it.title to it.amount }
                         onCreateList(listTitle, itemsToAdd)
@@ -151,7 +151,7 @@ fun AddItemScreen(
                     .padding(20.dp)
             ) {
                 Text(
-                    text = strings.formatItemCount(items.size),
+                    text = strings.formatItemCount(shoppingItems.size),
                     style = MaterialTheme.typography.labelLarge,
                     color = textPrimary,
                     fontWeight = FontWeight.Bold
@@ -208,7 +208,7 @@ fun AddItemScreen(
                 contentPadding = PaddingValues(16.dp)
             ) {
                 itemsIndexed(
-                    items = items,
+                    items = shoppingItems,
                     key = { _, item -> item.id }
                 ) { index, item ->
                     AnimatedVisibility(
@@ -226,27 +226,27 @@ fun AddItemScreen(
                             item = item,
                             index = index,
                             onTitleChange = { newTitle ->
-                                items = items.toMutableList().apply {
+                                shoppingItems = shoppingItems.toMutableList().apply {
                                     this[index] = this[index].copy(title = newTitle)
                                 }
                             },
                             onAmountChange = { newAmount ->
-                                items = items.toMutableList().apply {
+                                shoppingItems = shoppingItems.toMutableList().apply {
                                     this[index] = this[index].copy(amount = newAmount)
                                 }
                             },
                             onDelete = {
-                                if (items.size > 1) {
+                                if (shoppingItems.size > 1) {
                                     // Hide with animation first
                                     itemAnimationStates = itemAnimationStates + (item.id to false)
                                     // Remove from list after animation completes
                                     scope.launch {
                                         delay(300) // Match animation duration
-                                        items = items.filterIndexed { i, _ -> i != index }
+                                        shoppingItems = shoppingItems.filterIndexed { i, _ -> i != index }
                                     }
                                 }
                             },
-                            canDelete = items.size > 1,
+                            canDelete = shoppingItems.size > 1,
                             strings = strings,
                             surfaceColor = surfaceColor,
                             accentColor = accentColor,

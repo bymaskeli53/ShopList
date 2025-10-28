@@ -40,23 +40,23 @@ import org.koin.compose.koinInject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
-    list: ShoppingList,
+    shoppingList: ShoppingList,
     onNavigateBack: () -> Unit,
     onSave: suspend (String, String, List<ShoppingItem>) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val strings = LocalStrings.current
 
-    // Use remember with key to reset when list changes
-    var items by remember(list.id, list.items) {
-        mutableStateOf(list.items.map {
-            ShoppingItemFormState(id = it.id, title = it.title, amount = it.amount)
+    // Use remember with key to reset when shopping list changes
+    var shoppingItems by remember(shoppingList.id, shoppingList.items) {
+        mutableStateOf(shoppingList.items.map { item ->
+            ShoppingItemFormState(id = item.id, title = item.title, amount = item.amount)
         })
     }
 
     val initialItem = remember { ShoppingItemFormState() }
 
-    var listTitle by remember(list.id) { mutableStateOf(list.title) }
+    var listTitle by remember(shoppingList.id) { mutableStateOf(shoppingList.title) }
 
     var itemAnimationStates by remember { mutableStateOf(mapOf(initialItem.id to true)) }
 
@@ -111,7 +111,7 @@ fun DetailScreen(
                                 if (listTitle.isNotBlank()) {
                                     append("*$listTitle*\n\n")
                                 }
-                                items.filter { it.title.isNotBlank() }
+                                shoppingItems.filter { it.title.isNotBlank() }
                                     .forEachIndexed { index, item ->
                                         append("${index + 1}. ")
                                         if (item.amount.isNotBlank()) {
@@ -139,14 +139,14 @@ fun DetailScreen(
                         onClick = {
                             val spokenText = buildString {
                                 append("${strings.ttsListPrefix} ")
-                                items.filter { it.title.isNotBlank() }
+                                shoppingItems.filter { it.title.isNotBlank() }
                                     .forEachIndexed { index, item ->
                                         if (item.amount.isNotBlank()) {
                                             append("${item.amount} ${item.title}")
                                         } else {
                                             append(item.title)
                                         }
-                                        if (index < items.size - 1) {
+                                        if (index < shoppingItems.size - 1) {
                                             append(", ")
                                         }
                                     }
@@ -168,7 +168,7 @@ fun DetailScreen(
                     IconButton(
                         onClick = {
                             val newItem = ShoppingItemFormState()
-                            items = items + newItem
+                            shoppingItems = shoppingItems + newItem
 
                             itemAnimationStates = itemAnimationStates + (newItem.id to false)
 
@@ -199,23 +199,23 @@ fun DetailScreen(
             val size by animateDpAsState(
                 targetValue = if (isPressed) 76.dp else 64.dp
             )
-            val hasValidItems = items.any { it.title.isNotBlank() }
+            val hasValidItems = shoppingItems.any { it.title.isNotBlank() }
             if (hasValidItems) {
                 FloatingActionButton(
                     onClick = {
                         isPressed = !isPressed
                         scope.launch {
-                            val updatedItems = items
+                            val updatedShoppingItems = shoppingItems
                                 .filter { it.title.isNotBlank() }
-                                .map {
+                                .map { item ->
                                     ShoppingItem(
-                                        id = it.id,
-                                        title = it.title,
-                                        amount = it.amount
+                                        id = item.id,
+                                        title = item.title,
+                                        amount = item.amount
                                     )
                                 }
                             // Wait for the save to complete
-                            onSave(list.id, listTitle, updatedItems)
+                            onSave(shoppingList.id, listTitle, updatedShoppingItems)
                             // Navigate back after saving completes
                             onNavigateBack()
                         }
@@ -248,7 +248,7 @@ fun DetailScreen(
                     .padding(20.dp)
             ) {
                 Text(
-                    text = strings.formatItemCount(items.size),
+                    text = strings.formatItemCount(shoppingItems.size),
                     style = MaterialTheme.typography.labelLarge,
                     color = textPrimary,
                     fontWeight = FontWeight.Bold
@@ -304,7 +304,7 @@ fun DetailScreen(
                 contentPadding = PaddingValues(16.dp)
             ) {
                 itemsIndexed(
-                    items = items,
+                    items = shoppingItems,
                     key = { _, item -> item.id }
                 ) { index, item ->
                     AnimatedVisibility(
@@ -324,27 +324,27 @@ fun DetailScreen(
                             item = item,
                             index = index,
                             onTitleChange = { newTitle ->
-                                items = items.toMutableList().apply {
+                                shoppingItems = shoppingItems.toMutableList().apply {
                                     this[index] = this[index].copy(title = newTitle)
                                 }
                             },
                             onAmountChange = { newAmount ->
-                                items = items.toMutableList().apply {
+                                shoppingItems = shoppingItems.toMutableList().apply {
                                     this[index] = this[index].copy(amount = newAmount)
                                 }
                             },
                             onDelete = {
-                                if (items.size > 1) {
+                                if (shoppingItems.size > 1) {
                                     itemAnimationStates = itemAnimationStates + (item.id to false)
 
                                     scope.launch {
                                         delay(300)
-                                        items = items.filterIndexed { i, _ -> i != index }
+                                        shoppingItems = shoppingItems.filterIndexed { i, _ -> i != index }
 
                                     }
                                 }
                             },
-                            canDelete = items.size > 1,
+                            canDelete = shoppingItems.size > 1,
                             strings = strings,
                             surfaceColor = surfaceColor,
                             accentColor = accentColor,

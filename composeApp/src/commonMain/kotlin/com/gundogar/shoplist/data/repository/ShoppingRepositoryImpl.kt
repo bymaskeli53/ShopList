@@ -28,53 +28,53 @@ class ShoppingRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Sho
     private val database = ShopListDatabase(databaseDriverFactory.createDriver())
     private val queries = database.shoppingItemQueries
 
-    override fun getAllLists(): Flow<List<ShoppingList>> {
-        return queries.getAllLists().asFlow().mapToList(Dispatchers.IO).map { lists ->
-            lists.map { list ->
-                val items = queries.getItemsForList(list.id).executeAsList().map { item ->
+    override fun getAllShoppingLists(): Flow<List<ShoppingList>> {
+        return queries.getAllLists().asFlow().mapToList(Dispatchers.IO).map { dbLists ->
+            dbLists.map { dbList ->
+                val dbItems = queries.getItemsForList(dbList.id).executeAsList().map { dbItem ->
                     ShoppingItemEntity(
-                        id = item.id,
-                        title = item.title,
-                        amount = item.amount
+                        id = dbItem.id,
+                        title = dbItem.title,
+                        amount = dbItem.amount
                     )
                 }
                 ShoppingListEntity(
-                    listId = list.id,
-                    title = list.title,
-                    isCompleted = list.isCompleted == 1L,
-                    createdAt = list.createdAt,
-                    items = items
+                    listId = dbList.id,
+                    title = dbList.title,
+                    isCompleted = dbList.isCompleted == 1L,
+                    createdAt = dbList.createdAt,
+                    items = dbItems
                 ).toDomain()
             }
         }
     }
 
-    override suspend fun getListById(listId: String): ShoppingList? = withContext(Dispatchers.Default) {
-        val list = queries.getListById(listId).executeAsOneOrNull() ?: return@withContext null
-        val items = queries.getItemsForList(listId).executeAsList().map { item ->
+    override suspend fun getShoppingListById(listId: String): ShoppingList? = withContext(Dispatchers.Default) {
+        val dbList = queries.getListById(listId).executeAsOneOrNull() ?: return@withContext null
+        val dbItems = queries.getItemsForList(listId).executeAsList().map { dbItem ->
             ShoppingItemEntity(
-                id = item.id,
-                title = item.title,
-                amount = item.amount
+                id = dbItem.id,
+                title = dbItem.title,
+                amount = dbItem.amount
             )
         }
         ShoppingListEntity(
-            listId = list.id,
-            title = list.title,
-            isCompleted = list.isCompleted == 1L,
-            createdAt = list.createdAt,
-            items = items
+            listId = dbList.id,
+            title = dbList.title,
+            isCompleted = dbList.isCompleted == 1L,
+            createdAt = dbList.createdAt,
+            items = dbItems
         ).toDomain()
     }
 
-    override suspend fun createList(
+    override suspend fun createShoppingList(
         listId: String,
         title: String,
-        items: List<Pair<String, String>>
+        shoppingItems: List<Pair<String, String>>
     ) = withContext(Dispatchers.IO) {
         queries.transaction {
             val timestamp = Clock.System.now().toEpochMilliseconds()
-            // Insert the list
+            // Insert the shopping list
             queries.insertList(
                 id = listId,
                 title = title,
@@ -83,23 +83,23 @@ class ShoppingRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Sho
                 updatedAt = timestamp
             )
 
-            // Insert all items
-            items.forEachIndexed { index, (title, amount) ->
+            // Insert all shopping items
+            shoppingItems.forEachIndexed { index, (itemTitle, itemAmount) ->
                 queries.insertListItem(
                     id = uuid4().toString(),
                     listId = listId,
-                    title = title,
-                    amount = amount,
+                    title = itemTitle,
+                    amount = itemAmount,
                     position = index.toLong()
                 )
             }
         }
     }
 
-    override suspend fun updateList(
+    override suspend fun updateShoppingList(
         listId: String,
         title: String,
-        items: List<ShoppingItem>
+        shoppingItems: List<ShoppingItem>
     ) = withContext(Dispatchers.IO) {
         try {
             queries.transaction {
@@ -114,12 +114,12 @@ class ShoppingRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Sho
                 queries.deleteAllItemsForList(listId)
 
                 // Insert updated items with new IDs to avoid conflicts
-                items.forEachIndexed { index, item ->
+                shoppingItems.forEachIndexed { index, shoppingItem ->
                     queries.insertListItem(
                         id = uuid4().toString(),
                         listId = listId,
-                        title = item.title,
-                        amount = item.amount,
+                        title = shoppingItem.title,
+                        amount = shoppingItem.amount,
                         position = index.toLong()
                     )
                 }
@@ -137,33 +137,33 @@ class ShoppingRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Sho
         }
     }
 
-    override suspend fun toggleListCompleted(listId: String, isCompleted: Boolean) = withContext(Dispatchers.IO) {
+    override suspend fun toggleShoppingListCompletion(listId: String, isCompleted: Boolean) = withContext(Dispatchers.IO) {
         queries.updateListCompletionStatus(isCompleted = if (isCompleted) 1L else 0L, id = listId)
     }
 
-    override suspend fun deleteList(listId: String) = withContext(Dispatchers.IO) {
+    override suspend fun deleteShoppingList(listId: String) = withContext(Dispatchers.IO) {
         queries.deleteList(listId)
     }
 
-    override suspend fun restoreList(list: ShoppingList) = withContext(Dispatchers.IO) {
+    override suspend fun restoreShoppingList(shoppingList: ShoppingList) = withContext(Dispatchers.IO) {
         queries.transaction {
             val timestamp = Clock.System.now().toEpochMilliseconds()
-            // Re-insert the list
+            // Re-insert the shopping list
             queries.insertList(
-                id = list.id,
-                title = list.title,
-                isCompleted = if (list.isCompleted) 1L else 0L,
-                createdAt = list.createdAt,
+                id = shoppingList.id,
+                title = shoppingList.title,
+                isCompleted = if (shoppingList.isCompleted) 1L else 0L,
+                createdAt = shoppingList.createdAt,
                 updatedAt = timestamp
             )
 
-            // Re-insert all items
-            list.items.forEachIndexed { index, item ->
+            // Re-insert all shopping items
+            shoppingList.items.forEachIndexed { index, shoppingItem ->
                 queries.insertListItem(
-                    id = item.id,
-                    listId = list.id,
-                    title = item.title,
-                    amount = item.amount,
+                    id = shoppingItem.id,
+                    listId = shoppingList.id,
+                    title = shoppingItem.title,
+                    amount = shoppingItem.amount,
                     position = index.toLong()
                 )
             }

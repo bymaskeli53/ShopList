@@ -13,43 +13,43 @@ interface ShoppingRepository {
     /**
      * Get all shopping lists with their items as a Flow
      */
-    fun getAllLists(): Flow<List<ShoppingList>>
+    fun getAllShoppingLists(): Flow<List<ShoppingList>>
 
     /**
-     * Get a single list by ID
+     * Get a single shopping list by ID
      */
-    suspend fun getListById(listId: String): ShoppingList?
+    suspend fun getShoppingListById(listId: String): ShoppingList?
 
     /**
      * Create a new shopping list with items
      */
-    suspend fun createList(
+    suspend fun createShoppingList(
         listId: String,
         title: String,
-        items: List<Pair<String, String>> // title, amount pairs
+        shoppingItems: List<Pair<String, String>> // title, amount pairs
     )
 
     /**
-     * Update an existing list (title and items)
+     * Update an existing shopping list (title and items)
      */
-    suspend fun updateList(
+    suspend fun updateShoppingList(
         listId: String,
         title: String,
-        items: List<ShoppingItem>
+        shoppingItems: List<ShoppingItem>
     )
 
     /**
-     * Toggle the completed status of a list
+     * Toggle the completed status of a shopping list
      */
-    suspend fun toggleListCompleted(listId: String, isCompleted: Boolean)
+    suspend fun toggleShoppingListCompletion(listId: String, isCompleted: Boolean)
 
     /**
-     * Delete a list
+     * Delete a shopping list
      */
-    suspend fun deleteList(listId: String)
+    suspend fun deleteShoppingList(listId: String)
 
     /**
-     * Restore a deleted list (for undo functionality)
+     * Restore a deleted shopping list (for undo functionality)
      */
-    suspend fun restoreList(list: ShoppingList)
+    suspend fun restoreShoppingList(shoppingList: ShoppingList)
 }

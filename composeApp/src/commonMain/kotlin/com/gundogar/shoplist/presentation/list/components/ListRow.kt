@@ -46,7 +46,7 @@ import com.gundogar.shoplist.ui.strings.LocalStrings
 
 @Composable
 fun ListRow(
-    list: ShoppingList,
+    shoppingList: ShoppingList,
     onClick: (ShoppingList) -> Unit,
     onToggle: (ShoppingList) -> Unit,
     onReadAloud: (ShoppingList) -> Unit = {},
@@ -72,7 +72,7 @@ fun ListRow(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 72.dp) // Minimum touch target
-            .clickable { onClick(list) },
+            .clickable { onClick(shoppingList) },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = backgroundColor
@@ -94,16 +94,16 @@ fun ListRow(
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 16.dp)
-                    .alpha(if (list.isCompleted) 0.5f else 1f)
+                    .alpha(if (shoppingList.isCompleted) 0.5f else 1f)
             ) {
-                // Show list title if available
-                if (list.title.isNotBlank()) {
+                // Show shopping list title if available
+                if (shoppingList.title.isNotBlank()) {
                     Text(
-                        text = list.title,
+                        text = shoppingList.title,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = textColor,
-                        textDecoration = if (list.isCompleted) TextDecoration.LineThrough else null,
+                        textDecoration = if (shoppingList.isCompleted) TextDecoration.LineThrough else null,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -111,8 +111,8 @@ fun ListRow(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                // Show all items vertically
-                list.items.forEachIndexed { index, item ->
+                // Show all shopping items vertically
+                shoppingList.items.forEachIndexed { index, shoppingItem ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
@@ -124,26 +124,26 @@ fun ListRow(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = if (item.amount.isNotBlank()) {
-                                "${item.amount} ${item.title}"
+                            text = if (shoppingItem.amount.isNotBlank()) {
+                                "${shoppingItem.amount} ${shoppingItem.title}"
                             } else {
-                                item.title
+                                shoppingItem.title
                             },
                             style = MaterialTheme.typography.bodyMedium,
                             color = textColor.copy(alpha = 0.9f),
-                            textDecoration = if (list.isCompleted) TextDecoration.LineThrough else null
+                            textDecoration = if (shoppingList.isCompleted) TextDecoration.LineThrough else null
                         )
                     }
 
                     // Add spacing between items (except after the last one)
-                    if (index < list.items.size - 1) {
+                    if (index < shoppingList.items.size - 1) {
                         Spacer(modifier = Modifier.height(4.dp))
                     }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = strings.formatItemCount(list.items.size),
+                    text = strings.formatItemCount(shoppingList.items.size),
                     style = MaterialTheme.typography.bodySmall,
                     color = textColor.copy(alpha = 0.6f)
                 )
@@ -157,7 +157,7 @@ fun ListRow(
                 // TTS button
                 IconButton(
                     onClick = {
-                        onReadAloud(list)
+                        onReadAloud(shoppingList)
                         isSpeaking = !isSpeaking
                               },
                     modifier = Modifier.size(48.dp)
@@ -174,13 +174,13 @@ fun ListRow(
                 Box(
                     modifier = Modifier
                         .size(48.dp) // Minimum 48dp touch target
-                        .clickable(onClick = { onToggle(list) }),
+                        .clickable(onClick = { onToggle(shoppingList) }),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = if (list.isCompleted) Icons.Filled.CheckCircle else Icons.Outlined.Circle,
-                        contentDescription = if (list.isCompleted) strings.statusCompleted else strings.statusNotCompleted,
-                        tint = if (list.isCompleted) accentColor else textColor.copy(alpha = 0.5f),
+                        imageVector = if (shoppingList.isCompleted) Icons.Filled.CheckCircle else Icons.Outlined.Circle,
+                        contentDescription = if (shoppingList.isCompleted) strings.statusCompleted else strings.statusNotCompleted,
+                        tint = if (shoppingList.isCompleted) accentColor else textColor.copy(alpha = 0.5f),
                         modifier = Modifier.size(32.dp)
                     )
                 }
