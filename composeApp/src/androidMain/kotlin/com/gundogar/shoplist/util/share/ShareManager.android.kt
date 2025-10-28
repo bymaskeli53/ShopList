@@ -12,7 +12,6 @@ actual class ShareManager actual constructor() : KoinComponent {
 
     actual fun shareToWhatsApp(text: String) {
         try {
-            // Check if WhatsApp is installed
             val packageManager = context.packageManager
             val isWhatsAppInstalled = try {
                 packageManager.getPackageInfo("com.whatsapp", PackageManager.GET_ACTIVITIES)
