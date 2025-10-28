@@ -329,7 +329,6 @@ xcodebuild -project iosApp/iosApp.xcodeproj \
 
 #### Android
 - 🎤 **Android TTS API**: Native Text-to-Speech
-- 🎨 **Material You**: Dynamic theming (Android 12+)
 - 📱 **WhatsApp Intent**: Direct sharing to WhatsApp
 - 🗄️ **SQLDelight Android Driver**: AndroidSqliteDriver
 
@@ -469,18 +468,6 @@ ShopList/
 ./gradlew check
 ```
 
-### Testing Strategy
-
-<div align="center">
-
-| Test Type | Coverage | Tools |
-|-----------|----------|-------|
-| **Unit Tests** | ViewModels, Mappers, Repository | JUnit, Kotlin Test |
-| **Integration Tests** | Database operations | SQLDelight Testing |
-| **UI Tests** | Compose screens, User interactions | Compose Test API |
-
-</div>
-
 ### Key Testable Components
 
 - ✅ **ViewModels**: All state transformations and business logic
@@ -516,7 +503,6 @@ ShopList/
 - ✅ **Dependency Injection** (v1.1.0) - Koin integration
 - ✅ **Text-to-Speech** (v1.0.0) - Voice readback
 - ✅ **MVVM Architecture** (v1.0.0) - Clean separation of concerns
-- ✅ **Material You** (v1.0.0) - Dynamic color theming
 
 ---
 
@@ -553,7 +539,6 @@ Contributions are **welcome**! Whether it's bug fixes, new features, or document
 - ✅ Keep functions small and focused (< 50 lines)
 - ✅ Follow **SOLID principles**
 - ✅ Use **dependency injection** (Koin)
-- ✅ Add unit tests for new features
 - ✅ Update documentation for API changes
 - ✅ Use proper **layer separation** (Presentation → Domain → Data)
 
@@ -621,21 +606,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 </div>
 
----
 
-## 🙏 Acknowledgments
-
-Special thanks to:
-
-- 🎯 **JetBrains** - For Kotlin and Compose Multiplatform
-- 🎨 **Google** - For Material Design and Android libraries
-- 💾 **Cash App** - For SQLDelight ORM
-- 💉 **Koin** - For lightweight dependency injection
-- 🌟 **Kotlin Community** - For amazing support and resources
-- 📚 **Open Source Contributors** - For inspiration and code samples
-- 🤖 **Anthropic Claude** - For development assistance and code review
-
----
 
 ## 🔗 Useful Resources
 
