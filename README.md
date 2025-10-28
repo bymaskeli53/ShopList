@@ -83,7 +83,7 @@ ShopList is a **Kotlin Multiplatform** shopping list application that demonstrat
 
 | Main List Screen | Add List | List Details |
 |:----------------:|:-------------:|:------------:|
-| ![iOS Screenshot 1](docs/screenshots/ios_1.png) | ![iOS Screenshot 2](docs/screenshots/ios_3.png) | ![iOS Screenshot 3](docs/screenshots/ios_2.png) |
+| ![iOS Screenshot 1](docs/screenshots/ios_1.png) | ![iOS Screenshot 2](docs/screenshots/ios_2.png) | ![iOS Screenshot 3](docs/screenshots/ios_3.png) |
 | View all your shopping lists with smart search | Create lists with quantities | Update list detail |
 
 </div>
