@@ -30,6 +30,7 @@ import com.gundogar.shoplist.domain.model.ShoppingItem
 import com.gundogar.shoplist.domain.model.ShoppingItemFormState
 import com.gundogar.shoplist.domain.model.ShoppingList
 import com.gundogar.shoplist.presentation.add.ItemEntryCard
+import com.gundogar.shoplist.ui.strings.LocalStrings
 import com.gundogar.shoplist.util.share.ShareManager
 import com.gundogar.shoplist.util.tts.TextToSpeechManager
 import kotlinx.coroutines.delay
@@ -44,6 +45,8 @@ fun DetailScreen(
     onSave: suspend (String, String, List<ShoppingItem>) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val strings = LocalStrings.current
+
     // Use remember with key to reset when list changes
     var items by remember(list.id, list.items) {
         mutableStateOf(list.items.map {
@@ -81,7 +84,7 @@ fun DetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Listeyi Düzenle",
+                        strings.screenTitleEditList,
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = textPrimary
@@ -94,7 +97,7 @@ fun DetailScreen(
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Geri",
+                            contentDescription = strings.contentDescBack,
                             tint = textPrimary,
                             modifier = Modifier.size(24.dp)
                         )
@@ -125,7 +128,7 @@ fun DetailScreen(
                     ) {
                         Icon(
                             Icons.Default.Share,
-                            contentDescription = "WhatsApp'ta paylaş",
+                            contentDescription = strings.contentDescShare,
                             tint = accentColor,
                             modifier = Modifier.size(24.dp)
                         )
@@ -135,7 +138,7 @@ fun DetailScreen(
                     IconButton(
                         onClick = {
                             val spokenText = buildString {
-                                append("Alışveriş listenizde. ")
+                                append("${strings.ttsListPrefix} ")
                                 items.filter { it.title.isNotBlank() }
                                     .forEachIndexed { index, item ->
                                         if (item.amount.isNotBlank()) {
@@ -147,7 +150,7 @@ fun DetailScreen(
                                             append(", ")
                                         }
                                     }
-                                append("Bulunmaktadır")
+                                append(" ${strings.ttsItemExists}")
                             }
                             ttsManager.speak(spokenText)
                         },
@@ -155,7 +158,7 @@ fun DetailScreen(
                     ) {
                         Icon(
                             Icons.Default.VolumeUp,
-                            contentDescription = "Listeyi oku",
+                            contentDescription = strings.contentDescReadList,
                             tint = accentColor,
                             modifier = Modifier.size(24.dp)
                         )
@@ -178,7 +181,7 @@ fun DetailScreen(
                     ) {
                         Icon(
                             Icons.Default.Add,
-                            contentDescription = "Yeni ürün ekle",
+                            contentDescription = strings.contentDescAddItem,
                             tint = accentColor,
                             modifier = Modifier.size(24.dp)
                         )
@@ -223,7 +226,7 @@ fun DetailScreen(
                 ) {
                     Icon(
                         Icons.Default.Check,
-                        contentDescription = "Kaydet",
+                        contentDescription = strings.contentDescSave,
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -245,14 +248,14 @@ fun DetailScreen(
                     .padding(20.dp)
             ) {
                 Text(
-                    text = "${items.size} ürün",
+                    text = strings.formatItemCount(items.size),
                     style = MaterialTheme.typography.labelLarge,
                     color = textPrimary,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Sağ üstteki + ile yeni ürün ekleyin",
+                    text = strings.instructionAddNewItem,
                     style = MaterialTheme.typography.bodySmall,
                     color = textSecondary
                 )
@@ -262,10 +265,10 @@ fun DetailScreen(
             OutlinedTextField(
                 value = listTitle,
                 onValueChange = { listTitle = it },
-                label = { Text("Liste Başlığı", color = textSecondary) },
+                label = { Text(strings.labelListTitle, color = textSecondary) },
                 placeholder = {
                     Text(
-                        "Örn: Haftalık Alışveriş",
+                        strings.placeholderListTitle,
                         color = textSecondary.copy(alpha = 0.6f)
                     )
                 },
@@ -342,6 +345,7 @@ fun DetailScreen(
                                 }
                             },
                             canDelete = items.size > 1,
+                            strings = strings,
                             surfaceColor = surfaceColor,
                             accentColor = accentColor,
                             textPrimary = textPrimary,

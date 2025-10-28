@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.gundogar.shoplist.domain.model.ShoppingList
+import com.gundogar.shoplist.ui.strings.LocalStrings
 
 
 @Composable
@@ -46,7 +47,7 @@ fun ListRow(
     textColor: Color,
     accentColor: Color
 ) {
-
+    val strings = LocalStrings.current
     var isSpeaking by remember { mutableStateOf(false) }
 
     val tintColor by animateColorAsState(
@@ -146,7 +147,7 @@ fun ListRow(
 
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "${list.items.size} ürün",
+                    text = strings.formatItemCount(list.items.size),
                     style = MaterialTheme.typography.bodySmall,
                     color = textColor.copy(alpha = 0.6f)
                 )
@@ -167,7 +168,7 @@ fun ListRow(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.VolumeUp,
-                        contentDescription = "Listeyi oku",
+                        contentDescription = strings.contentDescReadList,
                         tint = accentColor,
                         modifier = Modifier.size(24.dp).scale(iconScale)
                     )
@@ -182,7 +183,7 @@ fun ListRow(
                 ) {
                     Icon(
                         imageVector = if (list.isCompleted) Icons.Filled.CheckCircle else Icons.Outlined.Circle,
-                        contentDescription = if (list.isCompleted) "Tamamlandı" else "Tamamlanmadı",
+                        contentDescription = if (list.isCompleted) strings.statusCompleted else strings.statusNotCompleted,
                         tint = if (list.isCompleted) accentColor else textColor.copy(alpha = 0.5f),
                         modifier = Modifier.size(32.dp)
                     )

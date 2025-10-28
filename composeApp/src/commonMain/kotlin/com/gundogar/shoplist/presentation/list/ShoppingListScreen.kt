@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gundogar.shoplist.domain.model.ShoppingList
 import com.gundogar.shoplist.presentation.list.components.ListRow
+import com.gundogar.shoplist.ui.strings.LocalStrings
 import com.gundogar.shoplist.util.tts.TextToSpeechManager
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -43,6 +44,7 @@ fun ShoppingListScreen(
     onRestoreList: (ShoppingList) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    val strings = LocalStrings.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val ttsManager: TextToSpeechManager = koinInject()
@@ -88,7 +90,7 @@ fun ShoppingListScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Alışveriş Listem",
+                        strings.screenTitleShoppingList,
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = textPrimary
@@ -118,7 +120,7 @@ fun ShoppingListScreen(
             ) {
                 Icon(
                     Icons.Default.Add,
-                    contentDescription = "Add item",
+                    contentDescription = strings.contentDescAddItem,
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -142,11 +144,11 @@ fun ShoppingListScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
-                placeholder = { Text("Liste ara...", color = textSecondary.copy(alpha = 0.6f)) },
+                placeholder = { Text(strings.placeholderSearch, color = textSecondary.copy(alpha = 0.6f)) },
                 leadingIcon = {
                     Icon(
                         Icons.Default.Search,
-                        contentDescription = "Ara",
+                        contentDescription = strings.contentDescSearch,
                         tint = accentColor
                     )
                 },
@@ -155,7 +157,7 @@ fun ShoppingListScreen(
                         IconButton(onClick = { searchQuery = "" }) {
                             Icon(
                                 Icons.Default.Close,
-                                contentDescription = "Temizle",
+                                contentDescription = strings.actionDelete,
                                 tint = textSecondary
                             )
                         }
@@ -180,9 +182,9 @@ fun ShoppingListScreen(
             if (lists.isNotEmpty()) {
                 Text(
                     text = if (searchQuery.isEmpty()) {
-                        "${lists.size} adet listeniz var"
+                        strings.formatListCount(lists.size)
                     } else {
-                        "${filteredLists.size} sonuç bulundu"
+                        strings.formatSearchResults(filteredLists.size)
                     },
                     style = MaterialTheme.typography.labelMedium,
                     color = textSecondary,
@@ -197,13 +199,13 @@ fun ShoppingListScreen(
                     horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Henüz liste eklenmedi",
+                        text = strings.messageNoListsYet,
                         style = MaterialTheme.typography.bodyLarge,
                         color = textSecondary,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     Text(
-                        text = "Sağ alttaki + butonuna tıklayarak başlayın",
+                        text = strings.instructionAddFirstList,
                         style = MaterialTheme.typography.bodyMedium,
                         color = textSecondary.copy(alpha = 0.7f)
                     )
@@ -239,8 +241,8 @@ fun ShoppingListScreen(
                                 // Show snackbar with undo option
                                 scope.launch {
                                     val result = snackbarHostState.showSnackbar(
-                                        message = "Liste silindi",
-                                        actionLabel = "Geri Al",
+                                        message = strings.messageListDeleted,
+                                        actionLabel = strings.actionUndo,
                                         duration = SnackbarDuration.Short
                                     )
 
@@ -281,7 +283,7 @@ fun ShoppingListScreen(
                             ) {
                                 Icon(
                                     Icons.Default.Delete,
-                                    contentDescription = "Sil",
+                                    contentDescription = strings.contentDescDelete,
                                     tint = Color.White,
                                     modifier = Modifier.size(32.dp)
                                 )

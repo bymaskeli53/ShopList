@@ -15,14 +15,16 @@ import com.gundogar.shoplist.presentation.detail.DetailViewModel
 import com.gundogar.shoplist.presentation.list.ShoppingListScreen
 import com.gundogar.shoplist.presentation.list.ShoppingListViewModel
 import com.gundogar.shoplist.presentation.theme.ShopListTheme
+import com.gundogar.shoplist.ui.strings.LocalizationProvider
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 @Preview
 fun App() {
-    ShopListTheme {
-        val navController = rememberNavController()
+    LocalizationProvider {
+        ShopListTheme {
+            val navController = rememberNavController()
 
 
         // Initialize ViewModels
@@ -73,6 +75,7 @@ fun App() {
                     )
                 }
             }
+        }
         }
     }
 }

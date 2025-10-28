@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gundogar.shoplist.domain.model.ShoppingItemFormState
+import com.gundogar.shoplist.ui.strings.LocalStrings
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -37,6 +38,7 @@ fun AddItemScreen(
     onCreateList: (String, List<Pair<String, String>>) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val strings = LocalStrings.current
     var listTitle by remember { mutableStateOf("") }
     val initialItem = remember { ShoppingItemFormState() }
     var items by remember { mutableStateOf(listOf(initialItem)) }
@@ -58,7 +60,7 @@ fun AddItemScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Ürün Ekle",
+                        strings.screenTitleAddItem,
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = textPrimary
@@ -71,7 +73,7 @@ fun AddItemScreen(
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Geri",
+                            contentDescription = strings.contentDescBack,
                             tint = textPrimary,
                             modifier = Modifier.size(24.dp)
                         )
@@ -96,7 +98,7 @@ fun AddItemScreen(
                     ) {
                         Icon(
                             Icons.Default.Add,
-                            contentDescription = "Yeni ürün ekle",
+                            contentDescription = strings.contentDescAddItem,
                             tint = accentColor,
                             modifier = Modifier.size(24.dp)
                         )
@@ -127,7 +129,7 @@ fun AddItemScreen(
                 ) {
                     Icon(
                         Icons.Default.Check,
-                        contentDescription = "Kaydet",
+                        contentDescription = strings.contentDescSave,
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -149,14 +151,14 @@ fun AddItemScreen(
                     .padding(20.dp)
             ) {
                 Text(
-                    text = "${items.size} ürün",
+                    text = strings.formatItemCount(items.size),
                     style = MaterialTheme.typography.labelLarge,
                     color = textPrimary,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Sağ üstteki + ile yeni ürün ekleyin",
+                    text = strings.instructionAddNewItem,
                     style = MaterialTheme.typography.bodySmall,
                     color = textSecondary
                 )
@@ -166,10 +168,10 @@ fun AddItemScreen(
             OutlinedTextField(
                 value = listTitle,
                 onValueChange = { listTitle = it },
-                label = { Text("Liste Başlığı", color = textSecondary) },
+                label = { Text(strings.labelListTitle, color = textSecondary) },
                 placeholder = {
                     Text(
-                        "Örn: Haftalık Alışveriş",
+                        strings.placeholderListTitle,
                         color = textSecondary.copy(alpha = 0.6f)
                     )
                 },
@@ -245,6 +247,7 @@ fun AddItemScreen(
                                 }
                             },
                             canDelete = items.size > 1,
+                            strings = strings,
                             surfaceColor = surfaceColor,
                             accentColor = accentColor,
                             textPrimary = textPrimary,
@@ -270,6 +273,7 @@ fun ItemEntryCard(
     onAmountChange: (String) -> Unit,
     onDelete: () -> Unit,
     canDelete: Boolean,
+    strings: com.gundogar.shoplist.ui.strings.Strings,
     surfaceColor: Color,
     accentColor: Color,
     textPrimary: Color,
@@ -306,7 +310,7 @@ fun ItemEntryCard(
                     ) {
                         Icon(
                             Icons.Default.Delete,
-                            contentDescription = "Sil",
+                            contentDescription = strings.contentDescDelete,
                             tint = textSecondary,
                             modifier = Modifier.size(20.dp)
                         )
@@ -320,8 +324,8 @@ fun ItemEntryCard(
             OutlinedTextField(
                 value = item.title,
                 onValueChange = onTitleChange,
-                label = { Text("Ürün Adı", color = textSecondary) },
-                placeholder = { Text("Örn: Süt", color = textSecondary.copy(alpha = 0.6f)) },
+                label = { Text(strings.labelItemName, color = textSecondary) },
+                placeholder = { Text(strings.placeholderItemName, color = textSecondary.copy(alpha = 0.6f)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 56.dp),
@@ -347,8 +351,8 @@ fun ItemEntryCard(
             OutlinedTextField(
                 value = item.amount,
                 onValueChange = onAmountChange,
-                label = { Text("Miktar", color = textSecondary) },
-                placeholder = { Text("Örn: 2 adet", color = textSecondary.copy(alpha = 0.6f)) },
+                label = { Text(strings.labelQuantity, color = textSecondary) },
+                placeholder = { Text(strings.placeholderQuantity, color = textSecondary.copy(alpha = 0.6f)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 56.dp),
