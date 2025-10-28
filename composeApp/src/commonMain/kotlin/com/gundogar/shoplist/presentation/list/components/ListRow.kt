@@ -1,13 +1,20 @@
 package com.gundogar.shoplist.presentation.list.components
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.repeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -49,11 +56,6 @@ fun ListRow(
 ) {
     val strings = LocalStrings.current
     var isSpeaking by remember { mutableStateOf(false) }
-
-    val tintColor by animateColorAsState(
-        targetValue = if (isSpeaking) Color(0xFF00E676)  else Color(0xFFB0B0B0),
-        animationSpec = tween(300)
-    )
 
     val iconScale by animateFloatAsState(
         targetValue = if (isSpeaking) 1.4f else 1f,
