@@ -85,7 +85,7 @@ fun ListRow(
                 .fillMaxWidth()
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.Top
         ) {
             // List content
             Column(
@@ -94,7 +94,7 @@ fun ListRow(
                     .padding(end = 16.dp)
                     .alpha(if (list.isCompleted) 0.5f else 1f)
             ) {
-                // Show list title if available, otherwise show items
+                // Show list title if available
                 if (list.title.isNotBlank()) {
                     Text(
                         text = list.title,
@@ -106,46 +106,40 @@ fun ListRow(
                         overflow = TextOverflow.Ellipsis
                     )
 
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    // Show first few items as preview
-                    val itemsPreview = list.items.take(2).joinToString(", ") { item ->
-                        if (item.amount.isNotBlank()) {
-                            "${item.amount} ${item.title}"
-                        } else {
-                            item.title
-                        }
-                    } + if (list.items.size > 2) "..." else ""
-
-                    Text(
-                        text = itemsPreview,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = textColor.copy(alpha = 0.7f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                } else {
-                    // Fallback: Show items as comma-separated list
-                    val itemsText = list.items.joinToString(", ") { item ->
-                        if (item.amount.isNotBlank()) {
-                            "${item.amount} ${item.title}"
-                        } else {
-                            item.title
-                        }
-                    }
-
-                    Text(
-                        text = itemsText,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Medium,
-                        color = textColor,
-                        textDecoration = if (list.isCompleted) TextDecoration.LineThrough else null,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                // Show all items vertically
+                list.items.forEachIndexed { index, item ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "• ",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = accentColor,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = if (item.amount.isNotBlank()) {
+                                "${item.amount} ${item.title}"
+                            } else {
+                                item.title
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = textColor.copy(alpha = 0.9f),
+                            textDecoration = if (list.isCompleted) TextDecoration.LineThrough else null
+                        )
+                    }
+
+                    // Add spacing between items (except after the last one)
+                    if (index < list.items.size - 1) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = strings.formatItemCount(list.items.size),
                     style = MaterialTheme.typography.bodySmall,
