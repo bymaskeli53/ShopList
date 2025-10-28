@@ -68,7 +68,6 @@ actual class TextToSpeechManager actual constructor() : KoinComponent {
     actual fun speak(text: String) {
         ensureInitialized {
             tts?.speak(text, AndroidTTS.QUEUE_FLUSH, null, null)
-          //  tts?.setSpeechRate(0.2f)
         }
     }
 
