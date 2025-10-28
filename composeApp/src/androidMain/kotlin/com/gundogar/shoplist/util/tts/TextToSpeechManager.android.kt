@@ -12,10 +12,6 @@ actual class TextToSpeechManager actual constructor() : KoinComponent {
     private var tts: AndroidTTS? = null
     private var isInitialized = false
 
-    init {
-        // TTS will be initialized lazily when speak is first called
-    }
-
     private fun ensureInitialized(onReady: () -> Unit) {
         if (isInitialized) {
             onReady()
