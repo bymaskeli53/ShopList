@@ -23,7 +23,7 @@ ShopList is a **Kotlin Multiplatform** shopping list application that demonstrat
 ### Why ShopList?
 
 - 🌍 **Multilingual Support**: Full localization with automatic system language detection (Turkish & English)
-- 🎨 **Beautiful UI**: High-contrast design with Material You dynamic colors (Android 12+)
+- 🎨 **Beautiful UI**: High-contrast design 
 - ♿ **Accessibility First**: Large touch targets (48dp+), screen reader support, and TTS features
 - 🔄 **Reactive Architecture**: Built with Kotlin Flow and StateFlow for seamless data updates
 - 🎯 **Clean Code**: MVVM + Clean Architecture with SOLID principles
@@ -49,12 +49,10 @@ ShopList is a **Kotlin Multiplatform** shopping list application that demonstrat
 | 🎯 **Item Quantity** | Track quantities and amounts for each item | ✅ |
 | ✏️ **Inline Editing** | Edit lists and items with smooth animations | ✅ |
 | 🌍 **Auto Language Detection** | Automatically uses your system language | ✅ |
-| 🎨 **Material You** | Dynamic colors that match your wallpaper (Android 12+) | ✅ |
 
 ### Technical Highlights
 
 - 🎭 **Smooth Animations**: Fade in/out and slide animations throughout the app
-- 🌈 **Dynamic Colors**: Adapts to wallpaper colors on Android 12+ (Material You)
 - 💾 **Instant Persistence**: All changes saved immediately to local database
 - 🔄 **Reactive UI**: Automatic updates when data changes via Flow
 - 🏗️ **Clean Architecture**: Proper layering with Domain, Data, and Presentation layers
