@@ -37,6 +37,7 @@ import org.koin.compose.koinInject
 @Composable
 fun ShoppingListScreen(
     shoppingLists: List<ShoppingList>,
+    isLoading: Boolean = false,
     onToggleCompleted: (ShoppingList) -> Unit = {},
     onListClick: (ShoppingList) -> Unit = {},
     onNavigateToAdd: () -> Unit = {},
@@ -178,42 +179,56 @@ fun ShoppingListScreen(
                 singleLine = true
             )
 
-            // List count indicator
-            if (shoppingLists.isNotEmpty()) {
-                Text(
-                    text = if (searchQuery.isEmpty()) {
-                        strings.formatListCount(shoppingLists.size)
-                    } else {
-                        strings.formatSearchResults(filteredShoppingLists.size)
-                    },
-                    style = MaterialTheme.typography.labelMedium,
-                    color = textSecondary,
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
-            } else {
-                // Empty state
-                Column(
+            // Loading indicator
+            if (isLoading) {
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 32.dp),
-                    horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = strings.messageNoListsYet,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = textSecondary,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    Text(
-                        text = strings.instructionAddFirstList,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = textSecondary.copy(alpha = 0.7f)
+                    CircularProgressIndicator(
+                        color = accentColor,
+                        modifier = Modifier.size(48.dp)
                     )
                 }
-            }
+            } else {
+                // List count indicator
+                if (shoppingLists.isNotEmpty()) {
+                    Text(
+                        text = if (searchQuery.isEmpty()) {
+                            strings.formatListCount(shoppingLists.size)
+                        } else {
+                            strings.formatSearchResults(filteredShoppingLists.size)
+                        },
+                        style = MaterialTheme.typography.labelMedium,
+                        color = textSecondary,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                } else {
+                    // Empty state
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 32.dp),
+                        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = strings.messageNoListsYet,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = textSecondary,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Text(
+                            text = strings.instructionAddFirstList,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = textSecondary.copy(alpha = 0.7f)
+                        )
+                    }
+                }
 
-            // Shopping lists
-            LazyColumn(
+                // Shopping lists
+                LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -324,6 +339,7 @@ fun ShoppingListScreen(
                 item {
                     Spacer(modifier = Modifier.height(80.dp))
                 }
+            }
             }
         }
     }

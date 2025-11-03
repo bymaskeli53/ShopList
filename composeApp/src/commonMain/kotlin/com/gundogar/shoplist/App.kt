@@ -34,6 +34,7 @@ fun App() {
 
         // Observe shopping lists from ViewModel
         val shoppingLists by listViewModel.shoppingLists.collectAsState()
+        val isLoading by listViewModel.isLoading.collectAsState()
 
         NavHost(
             navController = navController,
@@ -42,6 +43,7 @@ fun App() {
             composable("shopping_list") {
                 ShoppingListScreen(
                     shoppingLists = shoppingLists,
+                    isLoading = isLoading,
                     onToggleCompleted = { shoppingList -> listViewModel.toggleShoppingListCompletion(shoppingList) },
                     onListClick = { shoppingList -> navController.navigate("detail/${shoppingList.id}") },
                     onNavigateToAdd = { navController.navigate("add_item") },

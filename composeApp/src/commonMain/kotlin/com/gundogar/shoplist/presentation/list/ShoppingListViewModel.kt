@@ -20,14 +20,19 @@ class ShoppingListViewModel(
     private val _shoppingLists = MutableStateFlow<List<ShoppingList>>(emptyList())
     val shoppingLists: StateFlow<List<ShoppingList>> = _shoppingLists.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     init {
         loadAllShoppingLists()
     }
 
     private fun loadAllShoppingLists() {
         viewModelScope.launch {
+            _isLoading.value = true
             repository.getAllShoppingLists().collect { fetchedLists ->
                 _shoppingLists.value = fetchedLists
+                _isLoading.value = false
             }
         }
     }
