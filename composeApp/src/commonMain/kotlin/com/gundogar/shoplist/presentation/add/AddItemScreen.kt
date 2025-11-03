@@ -1,30 +1,63 @@
 package com.gundogar.shoplist.presentation.add
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.gundogar.shoplist.domain.model.ShoppingItemFormState
 import com.gundogar.shoplist.ui.strings.LocalStrings
@@ -45,7 +78,8 @@ fun AddItemScreen(
     var itemAnimationStates by remember { mutableStateOf(mapOf(initialItem.id to true)) }
     val scope = rememberCoroutineScope()
 
-
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
 
 
     // High-contrast color scheme matching ShoppingListScreen
@@ -166,6 +200,15 @@ fun AddItemScreen(
 
             // List Title Input
             OutlinedTextField(
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    }
+                ),
+
                 value = listTitle,
                 onValueChange = { listTitle = it },
                 label = { Text(strings.labelListTitle, color = textSecondary) },
@@ -178,7 +221,8 @@ fun AddItemScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-                    .padding(top = 16.dp),
+                    .padding(top = 16.dp)
+                    .focusRequester(focusRequester),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = textPrimary,
                     unfocusedTextColor = textPrimary,
@@ -242,7 +286,8 @@ fun AddItemScreen(
                                     // Remove from list after animation completes
                                     scope.launch {
                                         delay(300) // Match animation duration
-                                        shoppingItems = shoppingItems.filterIndexed { i, _ -> i != index }
+                                        shoppingItems =
+                                            shoppingItems.filterIndexed { i, _ -> i != index }
                                     }
                                 }
                             },
@@ -251,7 +296,9 @@ fun AddItemScreen(
                             surfaceColor = surfaceColor,
                             accentColor = accentColor,
                             textPrimary = textPrimary,
-                            textSecondary = textSecondary
+                            textSecondary = textSecondary,
+                            focusManager = focusManager,
+                            focusRequester = focusRequester
                         )
                     }
                 }
@@ -277,7 +324,9 @@ fun ItemEntryCard(
     surfaceColor: Color,
     accentColor: Color,
     textPrimary: Color,
-    textSecondary: Color
+    textSecondary: Color,
+    focusRequester: FocusRequester,
+    focusManager: FocusManager
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -324,11 +373,25 @@ fun ItemEntryCard(
             OutlinedTextField(
                 value = item.title,
                 onValueChange = onTitleChange,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    }
+                ),
                 label = { Text(strings.labelItemName, color = textSecondary) },
-                placeholder = { Text(strings.placeholderItemName, color = textSecondary.copy(alpha = 0.6f)) },
+                placeholder = {
+                    Text(
+                        strings.placeholderItemName,
+                        color = textSecondary.copy(alpha = 0.6f)
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 56.dp),
+                    .heightIn(min = 56.dp)
+                    .focusRequester(focusRequester = focusRequester),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = textPrimary,
                     unfocusedTextColor = textPrimary,
@@ -352,7 +415,12 @@ fun ItemEntryCard(
                 value = item.amount,
                 onValueChange = onAmountChange,
                 label = { Text(strings.labelQuantity, color = textSecondary) },
-                placeholder = { Text(strings.placeholderQuantity, color = textSecondary.copy(alpha = 0.6f)) },
+                placeholder = {
+                    Text(
+                        strings.placeholderQuantity,
+                        color = textSecondary.copy(alpha = 0.6f)
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 56.dp),
