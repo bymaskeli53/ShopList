@@ -124,10 +124,15 @@ fun ListRow(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = if (shoppingItem.amount.isNotBlank()) {
-                                "${shoppingItem.amount} ${shoppingItem.title}"
-                            } else {
-                                shoppingItem.title
+                            text = buildString {
+                                if (shoppingItem.quantity.isNotBlank() && shoppingItem.unit.isNotBlank()) {
+                                    append("${shoppingItem.quantity} ${shoppingItem.unit} ")
+                                } else if (shoppingItem.quantity.isNotBlank()) {
+                                    append("${shoppingItem.quantity} ")
+                                } else if (shoppingItem.unit.isNotBlank()) {
+                                    append("${shoppingItem.unit} ")
+                                }
+                                append(shoppingItem.title)
                             },
                             style = MaterialTheme.typography.bodyMedium,
                             color = textColor.copy(alpha = 0.9f),

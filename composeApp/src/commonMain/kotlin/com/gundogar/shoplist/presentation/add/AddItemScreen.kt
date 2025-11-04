@@ -68,7 +68,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddItemScreen(
     onNavigateBack: () -> Unit,
-    onCreateList: (String, List<Pair<String, String>>) -> Unit,
+    onCreateList: (String, List<Triple<String, String, String>>) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val strings = LocalStrings.current
@@ -147,13 +147,14 @@ fun AddItemScreen(
         floatingActionButton = {
 
 
-            val hasValidItems = shoppingItems.any { it.title.isNotBlank() }
+            val hasValidItems =
+                shoppingItems.any { it.title.isNotBlank() && it.quantityError == null && it.unitError == null }
             if (hasValidItems) {
                 FloatingActionButton(
                     onClick = {
                         val itemsToAdd = shoppingItems
-                            .filter { it.title.isNotBlank() }
-                            .map { it.title to it.amount }
+                            .filter { it.title.isNotBlank() && it.quantityError == null && it.unitError == null }
+                            .map { Triple(it.title, it.quantity, it.unit) }
                         onCreateList(listTitle, itemsToAdd)
                         onNavigateBack()
                     },
@@ -274,9 +275,26 @@ fun AddItemScreen(
                                     this[index] = this[index].copy(title = newTitle)
                                 }
                             },
-                            onAmountChange = { newAmount ->
+                            onQuantityChange = { newQuantity ->
+                                val error =
+                                    if (newQuantity.isNotBlank() && !newQuantity.matches(Regex("^[0-9]+(\\.[0-9]+)?$"))) {
+                                        strings.errorQuantityMustBeNumeric
+                                    } else null
                                 shoppingItems = shoppingItems.toMutableList().apply {
-                                    this[index] = this[index].copy(amount = newAmount)
+                                    this[index] = this[index].copy(
+                                        quantity = newQuantity,
+                                        quantityError = error
+                                    )
+                                }
+                            },
+                            onUnitChange = { newUnit ->
+                                val error =
+                                    if (newUnit.isNotBlank() && !newUnit.matches(Regex("^[a-zA-Z\\s]+$"))) {
+                                        strings.errorUnitMustBeString
+                                    } else null
+                                shoppingItems = shoppingItems.toMutableList().apply {
+                                    this[index] =
+                                        this[index].copy(unit = newUnit, unitError = error)
                                 }
                             },
                             onDelete = {
@@ -317,7 +335,8 @@ fun ItemEntryCard(
     item: ShoppingItemFormState,
     index: Int,
     onTitleChange: (String) -> Unit,
-    onAmountChange: (String) -> Unit,
+    onQuantityChange: (String) -> Unit,
+    onUnitChange: (String) -> Unit,
     onDelete: () -> Unit,
     canDelete: Boolean,
     strings: com.gundogar.shoplist.ui.strings.Strings,
@@ -401,7 +420,7 @@ fun ItemEntryCard(
                     unfocusedLabelColor = textSecondary,
                     cursorColor = accentColor,
                     focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent
+                    unfocusedContainerColor = Color.Transparent,
                 ),
                 shape = RoundedCornerShape(12.dp),
                 textStyle = MaterialTheme.typography.bodyLarge,
@@ -410,35 +429,86 @@ fun ItemEntryCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Amount input
-            OutlinedTextField(
-                value = item.amount,
-                onValueChange = onAmountChange,
-                label = { Text(strings.labelQuantity, color = textSecondary) },
-                placeholder = {
-                    Text(
-                        strings.placeholderQuantity,
-                        color = textSecondary.copy(alpha = 0.6f)
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 56.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = textPrimary,
-                    unfocusedTextColor = textPrimary,
-                    focusedBorderColor = accentColor,
-                    unfocusedBorderColor = textSecondary.copy(alpha = 0.5f),
-                    focusedLabelColor = accentColor,
-                    unfocusedLabelColor = textSecondary,
-                    cursorColor = accentColor,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent
-                ),
-                shape = RoundedCornerShape(12.dp),
-                textStyle = MaterialTheme.typography.bodyLarge,
-                singleLine = true
+            // Quantity and Unit Row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             )
+            {
+                // Quantity input
+                OutlinedTextField(
+                    value = item.quantity,
+                    onValueChange = onQuantityChange,
+                    label = { Text(strings.labelQuantity, color = textSecondary) },
+                    placeholder = {
+                        Text(
+                            strings.placeholderQuantity,
+                            color = textSecondary.copy(alpha = 0.6f)
+                        )
+                    },
+                    isError = item.quantityError != null,
+                    supportingText = item.quantityError?.let { error ->
+                        { Text(error, color = MaterialTheme.colorScheme.error) }
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .heightIn(min = 56.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = textPrimary,
+                        unfocusedTextColor = textPrimary,
+                        focusedBorderColor = accentColor,
+                        unfocusedBorderColor = textSecondary.copy(alpha = 0.5f),
+                        focusedLabelColor = accentColor,
+                        unfocusedLabelColor = textSecondary,
+                        cursorColor = accentColor,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        errorBorderColor = MaterialTheme.colorScheme.error,
+                        errorLabelColor = MaterialTheme.colorScheme.error,
+                        errorTextColor = MaterialTheme.colorScheme.error
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    singleLine = true
+                )
+
+                // Unit input
+                OutlinedTextField(
+                    value = item.unit,
+                    onValueChange = onUnitChange,
+                    label = { Text(strings.labelUnit, color = textSecondary) },
+                    placeholder = {
+                        Text(
+                            strings.placeholderUnit,
+                            color = textSecondary.copy(alpha = 0.6f)
+                        )
+                    },
+                    isError = item.unitError != null,
+                    supportingText = item.unitError?.let { error ->
+                        { Text(error, color = MaterialTheme.colorScheme.error) }
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .heightIn(min = 56.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = textPrimary,
+                        unfocusedTextColor = textPrimary,
+                        focusedBorderColor = accentColor,
+                        unfocusedBorderColor = textSecondary.copy(alpha = 0.5f),
+                        focusedLabelColor = accentColor,
+                        unfocusedLabelColor = textSecondary,
+                        cursorColor = accentColor,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        errorBorderColor = MaterialTheme.colorScheme.error,
+                        errorLabelColor = MaterialTheme.colorScheme.error,
+                        errorTextColor = MaterialTheme.colorScheme.error
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    singleLine = true
+                )
+            }
         }
     }
 }

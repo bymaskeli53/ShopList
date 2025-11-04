@@ -79,7 +79,7 @@ fun DetailScreen(
     // Use remember with key to reset when shopping list changes
     var shoppingItems by remember(shoppingList.id, shoppingList.items) {
         mutableStateOf(shoppingList.items.map { item ->
-            ShoppingItemFormState(id = item.id, title = item.title, amount = item.amount)
+            ShoppingItemFormState(id = item.id, title = item.title, quantity = item.quantity, unit = item.unit)
         })
     }
 
@@ -147,8 +147,12 @@ fun DetailScreen(
                                 shoppingItems.filter { it.title.isNotBlank() }
                                     .forEachIndexed { index, item ->
                                         append("${index + 1}. ")
-                                        if (item.amount.isNotBlank()) {
-                                            append("${item.amount} ${item.title}")
+                                        if (item.quantity.isNotBlank() && item.unit.isNotBlank()) {
+                                            append("${item.quantity} ${item.unit} ${item.title}")
+                                        } else if (item.quantity.isNotBlank()) {
+                                            append("${item.quantity} ${item.title}")
+                                        } else if (item.unit.isNotBlank()) {
+                                            append("${item.unit} ${item.title}")
                                         } else {
                                             append(item.title)
                                         }
@@ -174,8 +178,12 @@ fun DetailScreen(
                                 append("${strings.ttsListPrefix} ")
                                 shoppingItems.filter { it.title.isNotBlank() }
                                     .forEachIndexed { index, item ->
-                                        if (item.amount.isNotBlank()) {
-                                            append("${item.amount} ${item.title}")
+                                        if (item.quantity.isNotBlank() && item.unit.isNotBlank()) {
+                                            append("${item.quantity} ${item.unit} ${item.title}")
+                                        } else if (item.quantity.isNotBlank()) {
+                                            append("${item.quantity} ${item.title}")
+                                        } else if (item.unit.isNotBlank()) {
+                                            append("${item.unit} ${item.title}")
                                         } else {
                                             append(item.title)
                                         }
@@ -232,19 +240,20 @@ fun DetailScreen(
             val size by animateDpAsState(
                 targetValue = if (isPressed) 76.dp else 64.dp
             )
-            val hasValidItems = shoppingItems.any { it.title.isNotBlank() }
+            val hasValidItems = shoppingItems.any { it.title.isNotBlank() && it.quantityError == null && it.unitError == null }
             if (hasValidItems) {
                 FloatingActionButton(
                     onClick = {
                         isPressed = !isPressed
                         scope.launch {
                             val updatedShoppingItems = shoppingItems
-                                .filter { it.title.isNotBlank() }
+                                .filter { it.title.isNotBlank() && it.quantityError == null && it.unitError == null }
                                 .map { item ->
                                     ShoppingItem(
                                         id = item.id,
                                         title = item.title,
-                                        amount = item.amount
+                                        quantity = item.quantity,
+                                        unit = item.unit
                                     )
                                 }
                             // Wait for the save to complete
@@ -327,7 +336,9 @@ fun DetailScreen(
                     unfocusedLabelColor = textSecondary,
                     cursorColor = accentColor,
                     focusedContainerColor = surfaceColor,
-                    unfocusedContainerColor = surfaceColor
+                    unfocusedContainerColor = surfaceColor,
+                    errorTextColor = MaterialTheme.colorScheme.error,
+
                 ),
                 shape = RoundedCornerShape(12.dp),
                 textStyle = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
@@ -370,9 +381,20 @@ fun DetailScreen(
                                     this[index] = this[index].copy(title = newTitle)
                                 }
                             },
-                            onAmountChange = { newAmount ->
+                            onQuantityChange = { newQuantity ->
+                                val error = if (newQuantity.isNotBlank() && !newQuantity.matches(Regex("^[0-9]+(\\.[0-9]+)?$"))) {
+                                    strings.errorQuantityMustBeNumeric
+                                } else null
                                 shoppingItems = shoppingItems.toMutableList().apply {
-                                    this[index] = this[index].copy(amount = newAmount)
+                                    this[index] = this[index].copy(quantity = newQuantity, quantityError = error)
+                                }
+                            },
+                            onUnitChange = { newUnit ->
+                                val error = if (newUnit.isNotBlank() && !newUnit.matches(Regex("^[a-zA-Z\\s]+$"))) {
+                                    strings.errorUnitMustBeString
+                                } else null
+                                shoppingItems = shoppingItems.toMutableList().apply {
+                                    this[index] = this[index].copy(unit = newUnit, unitError = error)
                                 }
                             },
                             onDelete = {

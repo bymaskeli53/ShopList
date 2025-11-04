@@ -20,12 +20,14 @@ object TurkishStrings : Strings {
     override val labelListTitle = "Liste Başlığı"
     override val labelItemName = "Ürün Adı"
     override val labelQuantity = "Miktar"
+    override val labelUnit = "Birim"
 
     // Placeholders
     override val placeholderSearch = "Liste ara..."
     override val placeholderListTitle = "Örn: Haftalık Alışveriş"
     override val placeholderItemName = "Örn: Süt"
-    override val placeholderQuantity = "Örn: 2 adet"
+    override val placeholderQuantity = "Örn: 2"
+    override val placeholderUnit = "Örn: adet"
 
     // Messages & Instructions
     override val messageListDeleted = "Liste silindi"
@@ -52,6 +54,10 @@ object TurkishStrings : Strings {
     override val contentDescAddItem = "Ürün ekle"
     override val contentDescShare = "WhatsApp'ta paylaş"
     override val contentDescReadList = "Listeyi oku"
+
+    // Error Messages
+    override val errorQuantityMustBeNumeric = "Miktar sayı olmalıdır"
+    override val errorUnitMustBeString = "Birim sadece harf içermelidir"
 
     // Format Functions
     override fun formatItemCount(count: Int): String = "$count $infoItemCount"

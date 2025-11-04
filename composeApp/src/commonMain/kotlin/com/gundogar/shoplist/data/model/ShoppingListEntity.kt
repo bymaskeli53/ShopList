@@ -21,7 +21,8 @@ data class ShoppingListEntity(
 data class ShoppingItemEntity(
     val id: String,
     val title: String,
-    val amount: String
+    val quantity: String,
+    val unit: String
 )
 
 /**
@@ -41,7 +42,8 @@ fun ShoppingItemEntity.toDomain(): ShoppingItem {
     return ShoppingItem(
         id = id,
         title = title,
-        amount = amount
+        quantity = quantity,
+        unit = unit
     )
 }
 
@@ -49,7 +51,8 @@ fun ShoppingItem.toEntity(): ShoppingItemEntity {
     return ShoppingItemEntity(
         id = id,
         title = title,
-        amount = amount
+        quantity = quantity,
+        unit = unit
     )
 }
 

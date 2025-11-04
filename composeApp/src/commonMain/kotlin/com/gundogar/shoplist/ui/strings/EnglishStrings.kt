@@ -20,12 +20,14 @@ object EnglishStrings : Strings {
     override val labelListTitle = "List Title"
     override val labelItemName = "Item Name"
     override val labelQuantity = "Quantity"
+    override val labelUnit = "Unit"
 
     // Placeholders
     override val placeholderSearch = "Search list..."
     override val placeholderListTitle = "e.g., Weekly Shopping"
     override val placeholderItemName = "e.g., Milk"
-    override val placeholderQuantity = "e.g., 2 pcs"
+    override val placeholderQuantity = "e.g., 2"
+    override val placeholderUnit = "e.g., pcs"
 
     // Messages & Instructions
     override val messageListDeleted = "List deleted"
@@ -52,6 +54,10 @@ object EnglishStrings : Strings {
     override val contentDescAddItem = "Add item"
     override val contentDescShare = "Share on WhatsApp"
     override val contentDescReadList = "Read list"
+
+    // Error Messages
+    override val errorQuantityMustBeNumeric = "Quantity must be a number"
+    override val errorUnitMustBeString = "Unit must contain only letters"
 
     // Format Functions
     override fun formatItemCount(count: Int): String = "$count $infoItemCount"

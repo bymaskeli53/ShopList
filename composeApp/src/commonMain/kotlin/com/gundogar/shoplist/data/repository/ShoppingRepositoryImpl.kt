@@ -35,7 +35,8 @@ class ShoppingRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Sho
                     ShoppingItemEntity(
                         id = dbItem.id,
                         title = dbItem.title,
-                        amount = dbItem.amount
+                        quantity = dbItem.quantity,
+                        unit = dbItem.unit
                     )
                 }
                 ShoppingListEntity(
@@ -55,7 +56,8 @@ class ShoppingRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Sho
             ShoppingItemEntity(
                 id = dbItem.id,
                 title = dbItem.title,
-                amount = dbItem.amount
+                quantity = dbItem.quantity,
+                unit = dbItem.unit
             )
         }
         ShoppingListEntity(
@@ -70,7 +72,7 @@ class ShoppingRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Sho
     override suspend fun createShoppingList(
         listId: String,
         title: String,
-        shoppingItems: List<Pair<String, String>>
+        shoppingItems: List<Triple<String, String, String>>
     ) = withContext(Dispatchers.IO) {
         queries.transaction {
             val timestamp = Clock.System.now().toEpochMilliseconds()
@@ -84,12 +86,13 @@ class ShoppingRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Sho
             )
 
             // Insert all shopping items
-            shoppingItems.forEachIndexed { index, (itemTitle, itemAmount) ->
+            shoppingItems.forEachIndexed { index, (itemTitle, itemQuantity, itemUnit) ->
                 queries.insertListItem(
                     id = uuid4().toString(),
                     listId = listId,
                     title = itemTitle,
-                    amount = itemAmount,
+                    quantity = itemQuantity,
+                    unit = itemUnit,
                     position = index.toLong()
                 )
             }
@@ -119,7 +122,8 @@ class ShoppingRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Sho
                         id = uuid4().toString(),
                         listId = listId,
                         title = shoppingItem.title,
-                        amount = shoppingItem.amount,
+                        quantity = shoppingItem.quantity,
+                        unit = shoppingItem.unit,
                         position = index.toLong()
                     )
                 }
@@ -163,7 +167,8 @@ class ShoppingRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Sho
                     id = shoppingItem.id,
                     listId = shoppingList.id,
                     title = shoppingItem.title,
-                    amount = shoppingItem.amount,
+                    quantity = shoppingItem.quantity,
+                    unit = shoppingItem.unit,
                     position = index.toLong()
                 )
             }

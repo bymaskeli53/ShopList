@@ -20,12 +20,14 @@ sealed interface Strings {
     val labelListTitle: String
     val labelItemName: String
     val labelQuantity: String
+    val labelUnit: String
 
     // Placeholders
     val placeholderSearch: String
     val placeholderListTitle: String
     val placeholderItemName: String
     val placeholderQuantity: String
+    val placeholderUnit: String
 
     // Messages & Instructions
     val messageListDeleted: String
@@ -52,6 +54,10 @@ sealed interface Strings {
     val contentDescAddItem: String
     val contentDescShare: String
     val contentDescReadList: String
+
+    // Error Messages
+    val errorQuantityMustBeNumeric: String
+    val errorUnitMustBeString: String
 
     // Format Functions
     fun formatItemCount(count: Int): String

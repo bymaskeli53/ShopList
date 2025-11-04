@@ -10,5 +10,8 @@ import com.benasher44.uuid.uuid4
 data class ShoppingItemFormState(
     val id: String = uuid4().toString(),
     val title: String = "",
-    val amount: String = ""
+    val quantity: String = "",
+    val unit: String = "",
+    val quantityError: String? = null,
+    val unitError: String? = null
 )

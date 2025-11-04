@@ -315,8 +315,12 @@ fun ShoppingListScreen(
                                 // Create a spoken text from the shopping list items
                                 val spokenText = buildString {
                                     selectedList.items.forEachIndexed { index, shoppingItem ->
-                                        if (shoppingItem.amount.isNotBlank()) {
-                                            append("${shoppingItem.amount} ${shoppingItem.title}")
+                                        if (shoppingItem.quantity.isNotBlank() && shoppingItem.unit.isNotBlank()) {
+                                            append("${shoppingItem.quantity} ${shoppingItem.unit} ${shoppingItem.title}")
+                                        } else if (shoppingItem.quantity.isNotBlank()) {
+                                            append("${shoppingItem.quantity} ${shoppingItem.title}")
+                                        } else if (shoppingItem.unit.isNotBlank()) {
+                                            append("${shoppingItem.unit} ${shoppingItem.title}")
                                         } else {
                                             append(shoppingItem.title)
                                         }

@@ -26,7 +26,7 @@ interface ShoppingRepository {
     suspend fun createShoppingList(
         listId: String,
         title: String,
-        shoppingItems: List<Pair<String, String>> // title, amount pairs
+        shoppingItems: List<Triple<String, String, String>> // title, quantity, unit triples
     )
 
     /**

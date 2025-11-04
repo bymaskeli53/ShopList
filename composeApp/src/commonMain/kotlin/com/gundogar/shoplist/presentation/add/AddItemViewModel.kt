@@ -14,7 +14,7 @@ class AddItemViewModel(
     private val repository: ShoppingRepository
 ) : ViewModel() {
 
-    fun createShoppingList(title: String, shoppingItems: List<Pair<String, String>>) {
+    fun createShoppingList(title: String, shoppingItems: List<Triple<String, String, String>>) {
         if (shoppingItems.isEmpty()) return
 
         viewModelScope.launch {

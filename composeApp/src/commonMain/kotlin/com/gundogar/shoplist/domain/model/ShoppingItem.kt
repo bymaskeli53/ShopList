@@ -6,5 +6,6 @@ package com.gundogar.shoplist.domain.model
 data class ShoppingItem(
     val id: String,
     val title: String,
-    val amount: String = ""
+    val quantity: String = "",
+    val unit: String = ""
 )
