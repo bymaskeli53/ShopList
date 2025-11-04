@@ -1,0 +1,69 @@
+-- Migration from schema version 1 to version 2
+-- Adds quantity and unit columns to replace the amount column
+
+-- Add the new columns
+ALTER TABLE ShoppingListItem ADD COLUMN quantity TEXT NOT NULL DEFAULT '';
+ALTER TABLE ShoppingListItem ADD COLUMN unit TEXT NOT NULL DEFAULT '';
+
+-- Migrate data from amount to quantity and unit
+-- Strategy: Parse the amount field to extract numeric quantity and text unit
+-- Examples:
+--   "2 kg" -> quantity="2", unit="kg"
+--   "1.5 liters" -> quantity="1.5", unit="liters"
+--   "2" -> quantity="2", unit=""
+--   "kg" -> quantity="", unit="kg"
+
+-- Create a temporary table with the migrated data
+CREATE TEMPORARY TABLE ShoppingListItem_temp AS
+SELECT
+    id,
+    listId,
+    title,
+    -- Extract quantity: take the leading number part from amount
+    CASE
+        -- Pure number (integer or decimal)
+        WHEN amount GLOB '[0-9]*' OR amount GLOB '[0-9]*.[0-9]*'
+             AND TRIM(SUBSTR(amount, LENGTH(REPLACE(amount, '.', '')) + 1)) = '' THEN amount
+        -- Number followed by space and text
+        WHEN amount GLOB '[0-9]* *' OR amount GLOB '[0-9]*.[0-9]* *' THEN
+             RTRIM(SUBSTR(amount, 1,
+                   CASE
+                       WHEN INSTR(amount, ' ') > 0 THEN INSTR(amount, ' ') - 1
+                       ELSE LENGTH(amount)
+                   END))
+        ELSE ''
+    END AS quantity,
+    -- Extract unit: take the text part after the number
+    CASE
+        -- If starts with number and has space, take everything after first space
+        WHEN (amount GLOB '[0-9]* *' OR amount GLOB '[0-9]*.[0-9]* *')
+             AND INSTR(amount, ' ') > 0 THEN
+             LTRIM(SUBSTR(amount, INSTR(amount, ' ') + 1))
+        -- If no number at start, treat whole thing as unit
+        WHEN amount NOT GLOB '[0-9]*' AND amount NOT GLOB '[0-9]*.[0-9]*'
+             AND amount != '' THEN amount
+        ELSE ''
+    END AS unit,
+    position
+FROM ShoppingListItem;
+
+-- Drop the old table
+DROP TABLE ShoppingListItem;
+
+-- Recreate the table with the new schema
+CREATE TABLE ShoppingListItem (
+    id TEXT PRIMARY KEY NOT NULL,
+    listId TEXT NOT NULL,
+    title TEXT NOT NULL,
+    quantity TEXT NOT NULL DEFAULT '',
+    unit TEXT NOT NULL DEFAULT '',
+    position INTEGER NOT NULL,
+    FOREIGN KEY (listId) REFERENCES ShoppingList(id) ON DELETE CASCADE
+);
+
+-- Copy data from temporary table
+INSERT INTO ShoppingListItem (id, listId, title, quantity, unit, position)
+SELECT id, listId, title, quantity, unit, position FROM ShoppingListItem_temp;
+
+-- Drop temporary table
+DROP TABLE ShoppingListItem_temp;
