@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -54,6 +56,7 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
@@ -77,6 +80,7 @@ fun AddItemScreen(
     var shoppingItems by remember { mutableStateOf(listOf(initialItem)) }
     var itemAnimationStates by remember { mutableStateOf(mapOf(initialItem.id to true)) }
     val scope = rememberCoroutineScope()
+    var showSuggestions by remember { mutableStateOf(false) }
 
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
@@ -200,45 +204,102 @@ fun AddItemScreen(
             }
 
             // List Title Input
-            OutlinedTextField(
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = {
-                        focusManager.moveFocus(FocusDirection.Down)
-                    }
-                ),
-
-                value = listTitle,
-                onValueChange = { listTitle = it },
-                label = { Text(strings.labelListTitle, color = textSecondary) },
-                placeholder = {
-                    Text(
-                        strings.placeholderListTitle,
-                        color = textSecondary.copy(alpha = 0.6f)
-                    )
-                },
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     .padding(top = 16.dp)
-                    .focusRequester(focusRequester),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = textPrimary,
-                    unfocusedTextColor = textPrimary,
-                    focusedBorderColor = accentColor,
-                    unfocusedBorderColor = textSecondary.copy(alpha = 0.5f),
-                    focusedLabelColor = accentColor,
-                    unfocusedLabelColor = textSecondary,
-                    cursorColor = accentColor,
-                    focusedContainerColor = surfaceColor,
-                    unfocusedContainerColor = surfaceColor
-                ),
-                shape = RoundedCornerShape(12.dp),
-                textStyle = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                singleLine = true
-            )
+            ) {
+                OutlinedTextField(
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {
+                            showSuggestions = false
+                            focusManager.moveFocus(FocusDirection.Down)
+                        }
+                    ),
+                    value = listTitle,
+                    onValueChange = { listTitle = it },
+                    label = { Text(strings.labelListTitle, color = textSecondary) },
+                    placeholder = {
+                        Text(
+                            strings.placeholderListTitle,
+                            color = textSecondary.copy(alpha = 0.6f)
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
+                        .onFocusChanged { focusState ->
+                            showSuggestions = focusState.isFocused && listTitle.isEmpty()
+                        },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = textPrimary,
+                        unfocusedTextColor = textPrimary,
+                        focusedBorderColor = accentColor,
+                        unfocusedBorderColor = textSecondary.copy(alpha = 0.5f),
+                        focusedLabelColor = accentColor,
+                        unfocusedLabelColor = textSecondary,
+                        cursorColor = accentColor,
+                        focusedContainerColor = surfaceColor,
+                        unfocusedContainerColor = surfaceColor
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    textStyle = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    singleLine = true
+                )
+
+                // Suggestions dropdown
+                AnimatedVisibility(
+                    visible = showSuggestions,
+                    enter = fadeIn() + slideInVertically(initialOffsetY = { -it / 4 }),
+                    exit = fadeOut() + slideOutVertically(targetOffsetY = { -it / 4 })
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = surfaceColor
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        ) {
+                            strings.listTitleSuggestions.forEach { suggestion ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            listTitle = suggestion
+                                            showSuggestions = false
+                                            focusManager.moveFocus(FocusDirection.Down)
+                                        }
+                                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        Icons.Default.Add,
+                                        contentDescription = null,
+                                        tint = accentColor,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(
+                                        text = suggestion,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = textPrimary
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 

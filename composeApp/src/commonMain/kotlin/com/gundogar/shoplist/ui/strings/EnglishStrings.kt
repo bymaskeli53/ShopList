@@ -59,6 +59,16 @@ object EnglishStrings : Strings {
     override val errorQuantityMustBeNumeric = "Quantity must be a number"
     override val errorUnitMustBeString = "Unit must contain only letters"
 
+    // List Title Suggestions
+    override val listTitleSuggestions = listOf(
+        "Weekly Shopping",
+        "Daily Shopping",
+        "Monthly Shopping",
+        "Grocery List",
+        "Party Supplies",
+        "BBQ Shopping"
+    )
+
     // Format Functions
     override fun formatItemCount(count: Int): String = "$count $infoItemCount"
     override fun formatListCount(count: Int): String = "You have $count $infoListCount"

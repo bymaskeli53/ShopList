@@ -59,6 +59,16 @@ object TurkishStrings : Strings {
     override val errorQuantityMustBeNumeric = "Miktar sayı olmalıdır"
     override val errorUnitMustBeString = "Birim sadece harf içermelidir"
 
+    // List Title Suggestions
+    override val listTitleSuggestions = listOf(
+        "Haftalık Alışveriş",
+        "Günlük Alışveriş",
+        "Aylık Alışveriş",
+        "Market Listesi",
+        "Parti Malzemeleri",
+        "Mangal Alışverişi"
+    )
+
     // Format Functions
     override fun formatItemCount(count: Int): String = "$count $infoItemCount"
     override fun formatListCount(count: Int): String = "$count $infoListCount"

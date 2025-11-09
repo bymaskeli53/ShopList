@@ -59,6 +59,9 @@ sealed interface Strings {
     val errorQuantityMustBeNumeric: String
     val errorUnitMustBeString: String
 
+    // List Title Suggestions
+    val listTitleSuggestions: List<String>
+
     // Format Functions
     fun formatItemCount(count: Int): String
     fun formatListCount(count: Int): String
